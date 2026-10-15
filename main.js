@@ -19,3 +19,10 @@ scale.forEach((color, i) => {
 document.getElementById('start').addEventListener('click', () => {
   alert('Level select coming soon!');
 });
+
+const TILE = 16;                      // pixels per tile
+const COLS = canvas.width / TILE;     // 320 / 16 = 20 tiles across
+const ROWS = canvas.height / TILE;    // 180 / 16 = 11.25 (see tip)
+
+ctx.fillStyle = scale[4];
+ctx.fillRect(0, 0, TILE, TILE);
