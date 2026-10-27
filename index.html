@@ -7,11 +7,71 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main id="screen">
+
+  <!-- 1. TITLE -->
+  <section class="screen active" id="screen-title">
     <h1>HOW TALL WILL YOUR CITY BE IN 2100?</h1>
-    <button id="start">PRESS START</button>
-  </main>
+    <button data-goto="screen-city">PRESS START</button>
+  </section>
+
+  <!-- 2. CITY SELECT -->
+  <section class="screen" id="screen-city">
+    <h2>CHOOSE YOUR CITY</h2>
+    <div class="choices">
+      <button data-city="China">CHINA</button>
+      <button data-city="Cote d'Ivoire">COTE D'IVOIRE</button>
+      <button data-city="Pakistan">PAKISTAN</button>
+      <button data-city="Rwanda">RWANDA</button>
+    </div>
+  </section>
+
+  <!-- 3. LEVEL 1: PAST -->
+  <section class="screen" id="screen-level1">
+    <h2>LEVEL 1: THE PAST</h2>
+    <p id="l1-city" class="info"></p>
+    <canvas id="canvas1" width="320" height="192"></canvas>
+    <p class="info">YEAR: <span id="l1-year">1980</span></p>
+    <input type="range" id="l1-slider" min="0" max="4" value="0" step="1">
+    <button data-goto="screen-world">CONTINUE</button>
+  </section>
+
+  <!-- 4. WORLD SELECT -->
+  <section class="screen" id="screen-world">
+    <h2>CHOOSE YOUR WORLD</h2>
+    <p class="info">SOCIETY (SSP)</p>
+    <div class="choices" id="ssp-choices">
+      <button data-ssp="SSP1">SSP1</button>
+      <button data-ssp="SSP2">SSP2</button>
+      <button data-ssp="SSP3">SSP3</button>
+      <button data-ssp="SSP4">SSP4</button>
+      <button data-ssp="SSP5">SSP5</button>
+    </div>
+    <p class="info">CITY SHAPE</p>
+    <div class="choices" id="path-choices">
+      <button data-pathway="sprawl">SPRAWL</button>
+      <button data-pathway="historical">HISTORICAL</button>
+      <button data-pathway="vertical">VERTICAL</button>
+    </div>
+    <button id="world-go" data-goto="screen-level2" disabled>GO TO THE FUTURE</button>
+  </section>
+
+  <!-- 5. LEVEL 2: FUTURE -->
+  <section class="screen" id="screen-level2">
+    <h2>LEVEL 2: THE FUTURE</h2>
+    <p id="l2-info" class="info"></p>
+    <canvas id="canvas2" width="320" height="192"></canvas>
+    <p class="info">YEAR: <span id="l2-year">2015</span></p>
+    <input type="range" id="l2-slider" min="0" max="4" value="0" step="1">
+    <button data-goto="screen-end">FINISH</button>
+  </section>
+
+  <!-- 6. ENDING -->
+  <section class="screen" id="screen-end">
+    <h2>THE END</h2>
+    <p id="end-summary" class="info"></p>
+    <button id="restart" data-goto="screen-title">PLAY AGAIN</button>
+  </section>
+
   <script src="main.js"></script>
 </body>
-<canvas id="city" width="320" height="192"></canvas>
 </html>
