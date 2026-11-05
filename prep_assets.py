@@ -1,10 +1,4 @@
-"""
-Turn the big overlay PNGs into small web-ready PNGs + one manifest.json.
-Run on YOUR laptop:
-    python prep_assets.py <assets_folder> <overlay_export_audit.csv> <out_folder> [width]
-Example:
-    python prep_assets.py interactive_browser_100m_fu3d_subset/assets overlay_export_audit.csv data 160
-"""
+
 import sys, json, re
 from pathlib import Path
 import numpy as np, pandas as pd
