@@ -32,8 +32,8 @@ const TEXTS = {
   },
   worldDefault: 'Pick a society (SSP) and a way of growing. Hover over a button to read about it.',
   level2: 'Drag the slider. 2015 is real. Everything after that is a model scenario.',
-  endLearned: 'WHAT YOU SAW: the same city can end up very different in 2100. Society (the SSP) sets how much it grows. The shape (sprawl, historical or vertical) decides whether it spreads out or piles up.',
-  endUncertain: 'WHAT WE DO NOT KNOW: these are scenarios, not predictions. Each combination is one model run, and no one can say which future is the most likely.',
+  endLearned: 'WHAT YOU SAW: à compléter',
+  endUncertain: 'WHAT WE DO NOT KNOW: AJOUTER limitations',
 };
 
 // =====================================================================
