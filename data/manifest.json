@@ -1,7 +1,7 @@
 {
  "Cote_d_Ivoire": {
   "width": 160,
-  "height": 160,
+  "height": 122,
   "vmax": 20.0,
   "history": [
    1980,
@@ -223,7 +223,7 @@
  },
  "China": {
   "width": 160,
-  "height": 123,
+  "height": 122,
   "vmax": 30.0,
   "history": [
    1980,
@@ -445,7 +445,7 @@
  },
  "Pakistan": {
   "width": 160,
-  "height": 160,
+  "height": 134,
   "vmax": 20.0,
   "history": [
    1980,
@@ -667,7 +667,7 @@
  },
  "Rwanda": {
   "width": 160,
-  "height": 160,
+  "height": 133,
   "vmax": 15.0,
   "history": [
    1980,
