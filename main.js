@@ -1,34 +1,34 @@
 // =====================================================================
-//  STORY TEXTS: edit everything the visitor reads here
+//  STORY TEXTS: TEXT A AJOUTER?
 // =====================================================================
 const TEXTS = {
   hook: 'Pick a city, travel from 1980 to 2100 and watch it grow, spread out or climb.',
   cityIntro: 'Four urban systems, four players. Which one do you want to follow?',
   city: {
-    China:    'The biggest map in the game: about 5,900 km² of grid cells.',
-    CIV:      'A system centred on Abidjan, on the Gulf of Guinea coast. About 2,200 km² of cells.',
-    Pakistan: 'An urban system of about 3,000 km² of cells, home to a dense, fast-changing core.',
-    Rwanda:   'The smallest map: about 1,050 km² of cells. Every pixel counts.',
+    China:    'A AJOUTER',
+    CIV:      'A AJOUTER',
+    Pakistan: 'A AJOUTER',
+    Rwanda:   'A AJOUTER',
   },
   // One line per observed year (Level 1)
   history: {
-    1980: '1980. The satellite archive begins. Bright cells are tall, built-up places.',
-    1990: '1990. Look at the edges: the city is spreading.',
-    2000: '2000. The centre gets taller while new patches appear around it.',
-    2010: '2010. Growth is uneven: some places shoot up, others barely change.',
-    2015: '2015. The last year we can observe. From here on, the future is a model.',
+    1980: '1980',
+    1990: '1990',
+    2000: '2000',
+    2010: '2010',
+    2015: '2015',
   },
   ssp: {
-    SSP1: 'SSP1, SUSTAINABILITY. Slower population growth, a greener world, compact cities.',
-    SSP2: 'SSP2, MIDDLE OF THE ROAD. Things keep going roughly as they have so far.',
-    SSP3: 'SSP3, REGIONAL RIVALRY. A fragmented world with weak cooperation and fast population growth.',
-    SSP4: 'SSP4, INEQUALITY. A divided world: some places thrive, others are left behind.',
-    SSP5: 'SSP5, FOSSIL-FUELLED DEVELOPMENT. Fast economic growth powered by fossil fuels.',
+    SSP1: 'SSP1',
+    SSP2: 'SSP2',
+    SSP3: 'SSP3',
+    SSP4: 'SSP4',
+    SSP5: 'SSP5',
   },
   pathway: {
-    sprawl:     'SPRAWL. New buildings take new land: the city spreads out, low and wide.',
-    historical: 'HISTORICAL. The city responds the way it did in the past: a mix of spreading and building up.',
-    vertical:   'VERTICAL. More buildings on the same land: the city grows up, not out.',
+    sprawl:     'SPRAWL',
+    historical: 'HISTORICAL',
+    vertical:   'VERTICAL',
   },
   worldDefault: 'Pick a society (SSP) and a way of growing. Hover over a button to read about it.',
   level2: 'Drag the slider. 2015 is real. Everything after that is a model scenario.',
