@@ -4,11 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>How tall will your city be in 2100?</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body data-screen="screen-title">
 
   <!-- Background: sky + pixel skyline (drawn in main.js) -->
+  <button id="mute" aria-label="Music on/off">&#9834; ON</button>
   <div id="sky"></div>
   <canvas id="skyline" width="320" height="64"></canvas>
 
@@ -47,16 +49,123 @@
           <div class="chip" id="l1-city"></div>
           <div class="chip year">YEAR <b id="l1-year">1980</b></div>
           <div class="chip" id="l1-source"></div>
+          <button class="hud-btn vt-toggle">V(t) CURVE</button>
+          <button class="hud-btn view-toggle">MAP VIEW</button>
         </div>
-        <div class="stage"><canvas id="canvas1" width="320" height="192"></canvas></div>
+        <div class="stage" id="stage1"><canvas id="canvas1" width="320" height="192"></canvas></div>
         <div class="legend" data-legend>
           <span class="legend-label">BUILT HEIGHT</span>
           <span>0 M</span><div class="legend-bar"></div><span class="legend-max">30 M</span>
         </div>
-        <input type="range" id="l1-slider" min="0" max="4" value="0" step="1" aria-label="Year">
+        <input type="range" id="l1-slider" class="tl tl-past" min="0" max="4" value="0" step="1" aria-label="Year">
+        <p class="timeline-key"><span class="key obs"></span>OBSERVED DATA (SATELLITE)</p>
         <p class="hint">&#9664; DRAG TO TRAVEL IN TIME &#9654;</p>
+        <div class="tools3d">
+          <label class="opacity">OVERLAY <input type="range" class="opacity-range" min="0.2" max="1" step="0.05" value="0.85" aria-label="Overlay opacity"></label>
+          <button class="hud-btn base-toggle">BASEMAP: DARK</button>
+          <button class="hud-btn floor-toggle">SHOWING ALL BLOCKS</button>
+          <button class="hud-btn exag-toggle">HEIGHT x10</button>
+        </div>
+        <div class="vt vt-window" id="vtwin1" hidden>
+          <div class="win-bar vt-bar"><span>VT_CURVE.EXE</span><button class="vt-close" aria-label="Close window"></button></div>
+          <div class="vt-body">
+            <div class="vt-title"><span>BUILT VOLUME V(t)</span><span id="vt1-cap"></span></div>
+            <canvas id="vt1" width="320" height="96"></canvas>
+            <div class="vt-axis"><span>1980</span><span>2015</span><span>2100</span></div>
+            <p class="timeline-key"><span class="key obs"></span>OBSERVED <span class="key sim"></span>SELECTED SCENARIO <span class="key alt"></span>OTHER SCENARIOS</p>
+            <p class="hint" id="vt1-note"></p>
+          </div>
+        </div>
         <div class="dialog"><p id="l1-dialog"></p></div>
-        <button data-goto="screen-world">NEXT: CHOOSE YOUR WORLD &#9654;</button>
+        <button data-goto="screen-mode">NEXT: CHOOSE A MODE &#9654;</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODE CHOICE -->
+  <section class="screen" id="screen-mode">
+    <div class="win">
+      <div class="win-bar"><span>CHOOSE_MODE.EXE</span><i></i><i></i><i></i></div>
+      <div class="win-body">
+        <h2>HOW DO YOU WANT TO PLAY?</h2>
+        <div class="cards">
+          <button class="card" data-goto="screen-world"><b>FREE EXPLORE</b><span>Try any of the 15 futures of your city and collect them all.</span></button>
+          <button class="card" id="to-missions" data-goto="screen-missions"><b>MISSIONS</b><span>Solve puzzles, predict the winner, lose lives, earn badges.</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION LIST -->
+  <section class="screen" id="screen-missions">
+    <div class="win">
+      <div class="win-bar"><span>MISSIONS.EXE</span><i></i><i></i><i></i></div>
+      <div class="win-body">
+        <h2>MISSIONS</h2>
+        <p class="lead" id="missions-city"></p>
+        <div id="mission-list"></div>
+        <div class="choices">
+          <button data-goto="screen-mode">&#9664; BACK</button>
+          <button data-goto="screen-badges">BADGES</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MISSION PLAY -->
+  <section class="screen" id="screen-play">
+    <div class="win wide">
+      <div class="win-bar"><span id="pm-title">MISSION</span><i></i><i></i><i></i></div>
+      <div class="win-body">
+        <div class="hud">
+          <div class="chip" id="pm-lives"></div>
+          <div class="chip" id="pm-try"></div>
+          <div class="chip" id="pm-score"></div>
+        </div>
+        <div class="dialog"><p id="pm-text"></p></div>
+
+        <div id="pm-predict-box">
+          <h2>YOUR PREDICTION: WHICH SHAPE WINS?</h2>
+          <div class="choices" id="pm-predict">
+            <button data-pred="sprawl">SPRAWL</button>
+            <button data-pred="historical">HISTORICAL</button>
+            <button data-pred="vertical">VERTICAL</button>
+          </div>
+        </div>
+
+        <h2>PICK YOUR WORLD</h2>
+        <div class="choices" id="pm-ssp"></div>
+        <div class="choices" id="pm-path">
+          <button data-pm-path="sprawl">SPRAWL</button>
+          <button data-pm-path="historical">HISTORICAL</button>
+          <button data-pm-path="vertical">VERTICAL</button>
+        </div>
+        <div class="choices">
+          <button id="pm-run" disabled>RUN &#9654;</button>
+          <button id="pm-hint">HINT (-20)</button>
+        </div>
+
+        <div class="stage" id="pm-stage"><canvas id="canvas3" width="320" height="192"></canvas></div>
+        <div class="legend"><span class="legend-label">2100</span><span class="chip" id="pm-source"></span></div>
+        <div class="dialog" id="pm-verdict-box"><p id="pm-verdict"></p></div>
+        <div class="choices">
+          <button id="pm-retry" hidden>RETRY MISSION</button>
+          <button id="pm-skip" hidden>SHOW ANSWER &amp; SKIP</button>
+          <button id="pm-next" hidden>NEXT &#9654;</button>
+          <button id="pm-back">&#9664; MISSION LIST</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BADGES -->
+  <section class="screen" id="screen-badges">
+    <div class="win">
+      <div class="win-bar"><span>TROPHIES.EXE</span><i></i><i></i><i></i></div>
+      <div class="win-body">
+        <h2>BADGES</h2>
+        <div id="badge-list"></div>
+        <button data-goto="screen-missions">&#9664; BACK</button>
       </div>
     </div>
   </section>
@@ -66,19 +175,23 @@
     <div class="win wide">
       <div class="win-bar"><span>CHOOSE_YOUR_WORLD.EXE</span><i></i><i></i><i></i></div>
       <div class="win-body">
+        <p class="lead" data-text="mission"></p>
         <h2>1. WHAT KIND OF SOCIETY?</h2>
-        <div class="choices" id="ssp-choices">
-          <button data-ssp="SSP1">SSP1</button>
-          <button data-ssp="SSP2">SSP2</button>
-          <button data-ssp="SSP3">SSP3</button>
-          <button data-ssp="SSP4">SSP4</button>
-          <button data-ssp="SSP5">SSP5</button>
-        </div>
+        <div class="ssp-cards" id="ssp-choices"></div>
+        <p class="legend-icons">
+          <span class="ico" data-ico="people"></span> POPULATION
+          <span class="ico" data-ico="coin"></span> ECONOMIC GROWTH
+          <span class="ctx"><span class="ico" data-ico="co2"></span> CO&#8322; (CONTEXT ONLY)</span>
+        </p>
         <h2>2. HOW DOES THE CITY GROW?</h2>
-        <div class="choices" id="path-choices">
-          <button data-pathway="sprawl">SPRAWL</button>
-          <button data-pathway="historical">HISTORICAL</button>
-          <button data-pathway="vertical">VERTICAL</button>
+        <div class="path-cards" id="path-choices">
+          <button data-pathway="sprawl"><span class="ico big" data-ico="sprawl"></span>SPRAWL<small>SPREADS OUT</small></button>
+          <button data-pathway="historical"><span class="ico big" data-ico="mix"></span>HISTORICAL<small>AS BEFORE</small></button>
+          <button data-pathway="vertical"><span class="ico big" data-ico="tower"></span>VERTICAL<small>BUILDS UP</small></button>
+        </div>
+        <div class="explore">
+          <span id="explore-title">WORLDS EXPLORED 0/15</span>
+          <div id="explore-grid" aria-label="Explored worlds"></div>
         </div>
         <div class="dialog"><p id="world-dialog"></p></div>
         <button id="world-go" data-goto="screen-level2" disabled>GO TO THE FUTURE &#9654;</button>
@@ -95,14 +208,33 @@
           <div class="chip" id="l2-info"></div>
           <div class="chip year">YEAR <b id="l2-year">2015</b></div>
           <div class="chip" id="l2-source"></div>
+          <button class="hud-btn vt-toggle">V(t) CURVE</button>
+          <button class="hud-btn view-toggle">MAP VIEW</button>
         </div>
-        <div class="stage"><canvas id="canvas2" width="320" height="192"></canvas></div>
+        <div class="stage" id="stage2"><canvas id="canvas2" width="320" height="192"></canvas></div>
         <div class="legend" data-legend>
           <span class="legend-label">BUILT HEIGHT</span>
           <span>0 M</span><div class="legend-bar"></div><span class="legend-max">30 M</span>
         </div>
-        <input type="range" id="l2-slider" min="0" max="9" value="0" step="1" aria-label="Year">
+        <input type="range" id="l2-slider" class="tl tl-future" min="0" max="9" value="0" step="1" aria-label="Year">
+        <p class="timeline-key"><span class="key obs"></span>OBSERVED DATA <span class="key sim"></span>MODEL SCENARIO</p>
         <p class="hint">&#9664; DRAG TO TRAVEL IN TIME &#9654;</p>
+        <div class="tools3d">
+          <label class="opacity">OVERLAY <input type="range" class="opacity-range" min="0.2" max="1" step="0.05" value="0.85" aria-label="Overlay opacity"></label>
+          <button class="hud-btn base-toggle">BASEMAP: DARK</button>
+          <button class="hud-btn floor-toggle">SHOWING ALL BLOCKS</button>
+          <button class="hud-btn exag-toggle">HEIGHT x10</button>
+        </div>
+        <div class="vt vt-window" id="vtwin2" hidden>
+          <div class="win-bar vt-bar"><span>VT_CURVE.EXE</span><button class="vt-close" aria-label="Close window"></button></div>
+          <div class="vt-body">
+            <div class="vt-title"><span>BUILT VOLUME V(t)</span><span id="vt2-cap"></span></div>
+            <canvas id="vt2" width="320" height="96"></canvas>
+            <div class="vt-axis"><span>1980</span><span>2015</span><span>2100</span></div>
+            <p class="timeline-key"><span class="key obs"></span>OBSERVED <span class="key sim"></span>SELECTED SCENARIO <span class="key alt"></span>OTHER SCENARIOS</p>
+            <p class="hint" id="vt2-note"></p>
+          </div>
+        </div>
         <div class="dialog"><p id="l2-dialog"></p></div>
         <button data-goto="screen-end">FINISH &#9654;</button>
       </div>
@@ -120,12 +252,17 @@
         <div class="dialog warn"><p data-text="endUncertain"></p></div>
         <div class="choices">
           <button data-goto="screen-world">TRY ANOTHER WORLD</button>
+          <button data-goto="screen-missions">MISSIONS</button>
           <button id="restart" data-goto="screen-title">PLAY AGAIN</button>
         </div>
       </div>
     </div>
   </section>
 
+  <div id="map3d" hidden></div>
+
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
