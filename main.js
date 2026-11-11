@@ -37,6 +37,7 @@ const TEXTS = {
   worldDefault: 'Pick a world (an SSP) and a way of growing. People and money decide how much a city builds. Move the mouse over a button to read about it.',
   level2: 'Move the slider. Up to 2015 the pictures are real. After 2015 they come from a computer model: they show one possible future, not a promise.',
   pickExplain: 'Move the mouse over a button to read what it means. Or open the GUIDE.',
+  endPlanning: 'NOBODY DRAWS A CITY FROM ABOVE. A city grows from thousands of small local decisions, a bit like a crowd finding its own path. Planning can change WHERE the buildings go. But HOW MUCH gets built depends on people and money.',
   endLearned: 'WHAT YOU SAW: the same city can look very different in 2100. The society (the SSP) decides how much gets built. The shape (sprawl, historical or vertical) decides if the city spreads out or piles up. And the same society can build a lot in one country and little in another, because people and money grow differently there.',
   endUncertain: 'WHAT WE DO NOT KNOW: these are possible futures, not predictions. Each one is a single model run, and nobody can say which future is the most likely.',
   guide: {
