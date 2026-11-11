@@ -271,3 +271,21 @@ body.view3d .legend-bar { background: linear-gradient(to right, #5e70a6, #9ec6c9
 .vt-close::after { transform: rotate(-45deg); }
 .vt-body { padding: 10px; display: flex; flex-direction: column; gap: 4px; background: var(--c-night); margin: 8px; border: 2px solid var(--c-indigo-700); }
 @media (max-width: 700px) { .vt-window { left: 8px; right: 8px; bottom: 8px; width: auto; } }
+
+
+/* ---------- guide window, small texts in buttons, score pulse ---------- */
+.choices button small { display: block; font-family: var(--font-body); font-size: 11px; margin-top: 4px; opacity: .85; }
+.dialog.explain { min-height: 56px; border-color: var(--c-teal-200); }
+.chip.bump { animation: bump .5s ease-out; }
+@keyframes bump { 0% { transform: scale(1.35); background: var(--c-peach); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .chip.bump { animation: none; } }
+.guide { top: 16px; bottom: auto; right: 16px; width: min(400px, calc(100vw - 32px)); max-height: calc(100vh - 32px); display: flex; flex-direction: column; }
+.guide[hidden] { display: none; }
+.guide-body { overflow-y: auto; font-size: 14px; gap: 6px; max-height: calc(100vh - 110px); }
+.guide-body h3 { font-size: 10px; margin: 10px 0 2px; color: var(--c-peach); }
+.guide-body p { margin: 0 0 4px; }
+.guide-body dl { margin: 0; }
+.guide-body dt { font-family: var(--font-title); font-size: 9px; margin-top: 6px; color: var(--c-teal-200); }
+.guide-body dd { margin: 2px 0 0; }
+@media (max-width: 700px) { .guide { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 60vh; } .guide-body { max-height: 45vh; } }
+@media (min-width: 1000px) { body.guide-open .screen { padding-right: 432px; } }

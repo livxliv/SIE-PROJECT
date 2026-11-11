@@ -2,40 +2,69 @@
 //  STORY TEXTS: edit everything the visitor reads here
 // =====================================================================
 const TEXTS = {
-  hook: 'Pick a city, travel from 1980 to 2100 and watch it grow, spread out or climb.',
-  cityIntro: 'Four urban systems, four players. Which one do you want to follow?',
+  hook: 'Pick a city, travel in time from 1980 to 2100, and watch it grow: wider, taller, or both.',
+  cityIntro: 'Four places, four stories. Which one do you want to follow?',
   city: {
-    China:    'Centred on Beijing. The biggest map in the game: about 5,900 km² of grid cells.',
-    CIV:      'Centred on Abidjan, on the Gulf of Guinea coast. About 2,200 km² of cells.',
-    Pakistan: 'An urban system of about 3,000 km² of cells, home to a dense, fast-changing core.',
-    Rwanda:   'The smallest map: about 1,050 km² of cells. Every pixel counts.',
+    China:    'Around Beijing. The biggest map in the game: about 5,900 km² of squares.',
+    CIV:      'Around Abidjan, on the coast of West Africa. About 2,200 km² of squares.',
+    Pakistan: 'A fast-changing area of about 3,000 km² with a very dense centre.',
+    Rwanda:   'The smallest map: about 1,050 km². Every pixel counts.',
   },
   // One line per observed year (Level 1)
   history: {
-    1980: '1980. The satellite archive begins. Bright cells are tall, built-up places.',
-    1990: '1990. Look at the edges: the city is spreading.',
-    2000: '2000. The centre gets taller while new patches appear around it.',
-    2010: '2010. Growth is uneven: some places shoot up, others barely change.',
-    2015: '2015. The last year we can observe. From here on, the future is a model.',
+    1980: '1980. The first satellite picture. Tall, bright squares are places with big buildings.',
+    1990: '1990. Look at the edges: the city is getting wider.',
+    2000: '2000. The middle gets taller and new patches appear around it.',
+    2010: '2010. Not every place grows the same way: some shoot up, others hardly change.',
+    2015: '2015. This is the last year with real data. After this, a computer model imagines the future.',
   },
+  // SSP = Shared Socioeconomic Pathway: a story about how the world may change (people, money, energy)
   ssp: {
-    SSP1: 'SSP1, SUSTAINABILITY. Slower population growth, a greener world, compact cities.',
-    SSP2: 'SSP2, MIDDLE OF THE ROAD. Things keep going roughly as they have so far.',
-    SSP3: 'SSP3, REGIONAL RIVALRY. A fragmented world with weak cooperation and fast population growth.',
-    SSP4: 'SSP4, INEQUALITY. A divided world: some places thrive, others are left behind.',
-    SSP5: 'SSP5, FOSSIL-FUELLED DEVELOPMENT. Fast economic growth powered by fossil fuels.',
+    SSP1: 'SSP1, GREEN WORLD. Fewer people, care for nature, and cities that stay compact.',
+    SSP2: 'SSP2, KEEP GOING (the middle road). The world goes on like it does today: not the best, not the worst. Many people see this as the "normal" future.',
+    SSP3: 'SSP3, DIVIDED WORLD. Countries do not work together. Many people, and the economy grows slowly.',
+    SSP4: 'SSP4, UNEQUAL WORLD. A few places get rich, many are left behind.',
+    SSP5: 'SSP5, FAST-GROWTH WORLD. The economy grows very fast, powered by oil, gas and coal.',
   },
+  // The shape is HOW the city adds buildings
   pathway: {
-    sprawl:     'SPRAWL. New buildings take new land: the city spreads out, low and wide.',
-    historical: 'HISTORICAL. The city responds the way it did in the past: a mix of spreading and building up.',
-    vertical:   'VERTICAL. More buildings on the same land: the city grows up, not out.',
+    sprawl:     'SPRAWL (spread out). New buildings take new ground. The city gets wider but stays low, like a pancake.',
+    historical: 'HISTORICAL (like in the past). The city grows the same way it did between 1980 and 2015: a bit of new ground and a bit of taller buildings. Use it for "what if nothing changes?".',
+    vertical:   'VERTICAL (build up). New buildings go on ground that is already built, so they get taller. The city stays small on the map, like a pile.',
   },
-  mission: 'MISSION: explore all 15 futures of a city. Which one spreads out the most? Which one climbs the highest?',
+  mission: 'MISSION: try all 15 futures of a city. Which one spreads out the most? Which one climbs the highest?',
   newWorld: 'NEW WORLD DISCOVERED! ',
-  worldDefault: 'Pick a society (SSP) and a way of growing. Population and economic growth drive how much a city builds. Hover over a button to read about it.',
-  level2: 'Drag the slider. 2015 is real. Everything after that is a model scenario.',
-  endLearned: 'WHAT YOU SAW: the same city can end up very different in 2100. Society (the SSP) sets how much it grows. The shape (sprawl, historical or vertical) decides whether it spreads out or piles up. And the same society can build the biggest city in one country and the smallest in another, because population and wealth grow differently there.',
-  endUncertain: 'WHAT WE DO NOT KNOW: these are scenarios, not predictions. Each combination is one model run, and no one can say which future is the most likely.',
+  worldDefault: 'Pick a world (an SSP) and a way of growing. People and money decide how much a city builds. Move the mouse over a button to read about it.',
+  level2: 'Move the slider. Up to 2015 the pictures are real. After 2015 they come from a computer model: they show one possible future, not a promise.',
+  pickExplain: 'Move the mouse over a button to read what it means. Or open the GUIDE.',
+  endLearned: 'WHAT YOU SAW: the same city can look very different in 2100. The society (the SSP) decides how much gets built. The shape (sprawl, historical or vertical) decides if the city spreads out or piles up. And the same society can build a lot in one country and little in another, because people and money grow differently there.',
+  endUncertain: 'WHAT WE DO NOT KNOW: these are possible futures, not predictions. Each one is a single model run, and nobody can say which future is the most likely.',
+  guide: {
+    sspIntro: 'An SSP is a story about how the world might change by 2100: how many people there will be, how rich countries get, and what energy they use. There are 5 stories. They are not predictions. They are different "what if" worlds.',
+    sspNames: { SSP1: 'SSP1 GREEN', SSP2: 'SSP2 KEEP GOING', SSP3: 'SSP3 DIVIDED', SSP4: 'SSP4 UNEQUAL', SSP5: 'SSP5 FAST GROWTH' },
+    ssp: {
+      SSP1: 'Fewer people. Care for nature. Compact cities.',
+      SSP2: 'The middle road. The world goes on like today. Your reference.',
+      SSP3: 'Countries do not cooperate. Many people, slow economy.',
+      SSP4: 'Big gaps between rich and poor.',
+      SSP5: 'Very fast economic growth, lots of oil, gas and coal.',
+    },
+    shapeIntro: 'The SHAPE is how the city adds new buildings. The society decides how much is built. The shape decides where it goes.',
+    shapeNames: { sprawl: 'SPRAWL', historical: 'HISTORICAL', vertical: 'VERTICAL' },
+    shape: {
+      sprawl: 'SPREAD OUT. New buildings take new ground. Wide and low, like a pancake.',
+      historical: 'LIKE IN THE PAST. The city keeps its habits from 1980 to 2015: some new ground, some taller buildings. This is the "nothing changes" choice.',
+      vertical: 'BUILD UP. New buildings go on land that is already built. Small on the map, but tall.',
+    },
+    wordNames: { ground: 'GROUND', volume: 'VOLUME', floor: 'ONE FLOOR', square: 'SQUARE' },
+    words: {
+      ground: 'How much land has buildings on it, seen from above.',
+      volume: 'How much building there is in total: the ground covered times the height.',
+      floor: 'About 3 metres of height. A square lower than this is more like a low shed than a building.',
+      square: 'One small piece of the map (a cell). The map is made of many squares.',
+    },
+    tip: 'Not sure where to start? Try SSP2 + HISTORICAL first. It is the "keep going" future. Then ask: what changes if I pick another SSP, or another shape?',
+  },
 };
 
 // =====================================================================
@@ -151,6 +180,7 @@ function showScreen(id) {
   if (id === 'screen-missions') renderMissionList();
   if (id === 'screen-badges') renderBadges();
   if (id === 'screen-title')  resetGame();
+  syncGuide();
 }
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.goto)));
 
@@ -196,11 +226,11 @@ function drawIcons(root = document) {
 //  O'Neill et al. 2017 and Riahi et al. 2017 before publishing, and cite them.
 // ---------------------------------------------------------------------
 const SSP_INFO = {
-  SSP1: { name: 'SUSTAINABILITY',  pop: 1, co2: 1, coin: 3 },
-  SSP2: { name: 'MIDDLE OF ROAD',  pop: 2, co2: 2, coin: 2 },
-  SSP3: { name: 'RIVALRY',         pop: 4, co2: 3, coin: 1 },
-  SSP4: { name: 'INEQUALITY',      pop: 3, co2: 2, coin: 2 },
-  SSP5: { name: 'FOSSIL-FUELLED',  pop: 1, co2: 4, coin: 4 },
+  SSP1: { name: 'GREEN',       pop: 1, co2: 1, coin: 3 },
+  SSP2: { name: 'KEEP GOING',  pop: 2, co2: 2, coin: 2 },
+  SSP3: { name: 'DIVIDED',     pop: 4, co2: 3, coin: 1 },
+  SSP4: { name: 'UNEQUAL',     pop: 3, co2: 2, coin: 2 },
+  SSP5: { name: 'FAST GROWTH', pop: 1, co2: 4, coin: 4 },
 };
 (function buildSspCards() {
   const box = $('ssp-choices');
@@ -386,10 +416,10 @@ document.querySelector('#screen-title [data-goto]').addEventListener('click', ()
 //  MISSIONS: puzzles built from data/metrics.json (made by make_metrics.py)
 //  Every mission is generated from the numbers of the 15 futures, so it always has a solution.
 // =====================================================================
-const MISSION_STORE = 'missions_v1';
+const MISSION_STORE = 'missions_v2';          // v2: missions now have ids (older progress is not reused)
 function loadStore() {
-  try { return Object.assign({ progress: {}, badges: {}, stats: { pred: 0 } }, JSON.parse(localStorage.getItem(MISSION_STORE) || '{}')); }
-  catch (e) { return { progress: {}, badges: {}, stats: { pred: 0 } }; }
+  try { return Object.assign({ progress: {}, badges: {}, stats: { tests: 0 } }, JSON.parse(localStorage.getItem(MISSION_STORE) || '{}')); }
+  catch (e) { return { progress: {}, badges: {}, stats: { tests: 0 } }; }
 }
 function saveStore(s) { try { localStorage.setItem(MISSION_STORE, JSON.stringify(s)); } catch (e) { /* ignore */ } }
 
@@ -399,14 +429,14 @@ const metricsReady = fetch('data/bars/metrics.json').then(r => r.json()).then(j 
 const BADGE_DEFS = {
   first_win:     ['FIRST WIN',      'Complete your first mission.'],
   gold:          ['GOLD STANDARD',  'Win a mission on the first try, without a hint.'],
-  oracle:        ['ORACLE',         'Predict the winning shape 3 times.'],
+  tester:        ['TESTER',         'Test 25 different worlds in the missions.'],
   floor_spotter: ['FLOOR SPOTTER',  'Finish the boss mission and spot the twist.'],
-  master:        ['CITY MASTER',    'Complete all 5 missions in one city.'],
+  master:        ['CITY MASTER',    'Complete every mission in one city.'],
   globetrotter:  ['GLOBETROTTER',   'Become City Master in all 4 cities.'],
 };
 const CITY_LIST = ['China', 'Cote_d_Ivoire', 'Pakistan', 'Rwanda'];
 
-// ---------- Build the 5 missions of the current city ----------
+// ---------- Build the missions of the current city ----------
 function buildMissions(cityKey) {
   const cm = metrics && metrics[cityKey];
   if (!cm || !cm['history|2015']) return null;
@@ -420,30 +450,50 @@ function buildMissions(cityKey) {
   const pct = x => Math.round(x);
   const NOLAND = 1.001;
   const noNewLand = w => w.m.footprint_01 <= base.footprint_01 * NOLAND;
+  const ref = worlds.find(w => w.ssp === 'SSP2' && w.path === 'historical');     // the "keep going" reference world
 
-  // 1. no new land
-  const m1 = { title: 'NO NEW LAND', text: 'Use NO NEW LAND: in 2100 the city must cover no more ground than it does today (2015). Pick a society and a shape.',
+  // 0. START HERE: meet the "keep going" future
+  const m0 = { id: 'trend', free: true, level: 'Start here', title: 'KEEP GOING',
+    text: 'START HERE. What if nothing special changes? Pick SSP2 (the world goes on like today) and HISTORICAL (the city grows like it did from 1980 to 2015). This is the "keep going" future.',
+    ok: w => w === ref,
+    feedback: w => `Not that one. You need BOTH: SSP2 (the middle world) and HISTORICAL (growing like in the past). You picked ${w.ssp} + ${w.path.toUpperCase()}.`,
+    twist: () => `THIS IS YOUR REFERENCE. If nothing special changes, in 2100 this city covers ${pct((ref.m.footprint_01 / base.footprint_01 - 1) * 100)}% more ground and has ${pct((ref.m.volume / base.volume - 1) * 100)}% more building volume than in 2015. The next missions ask you to do better or different.` };
+
+  // 1. beat the trend on land
+  const m1 = { id: 'beat', level: 'Easy', title: 'BEAT THE TREND',
+    text: 'Find a future where the city takes LESS new ground than the "keep going" future (SSP2 + HISTORICAL). You can change the society, the shape, or both.',
+    ok: w => w.m.footprint_01 < ref.m.footprint_01 * 0.999,
+    feedback: w => `Not better. This city covers ${pct(w.m.footprint_01 / ref.m.footprint_01 * 100)}% of the ground of the "keep going" future. You need less than 100%.`,
+    twist: w => w.ssp === 'SSP2'
+      ? 'You kept the same society (SSP2) and only changed the shape. The shape alone saved ground.'
+      : 'You changed the society (SSP). The society sets how many people and how much money there is, and that changes how much gets built.' };
+
+  // 2. no new land
+  const m2 = { id: 'noland', level: 'Easy', title: 'NO NEW GROUND',
+    text: 'In 2100 the city must not cover more ground than today (2015). It can only get taller. Pick a society and a shape.',
     ok: noNewLand,
-    feedback: w => `TOO SPREAD OUT. This city covers ${pct((w.m.footprint_01 / base.footprint_01 - 1) * 100)}% more land than in 2015.` };
+    feedback: w => `TOO SPREAD OUT. This city covers ${pct((w.m.footprint_01 / base.footprint_01 - 1) * 100)}% more ground than in 2015.` };
 
-  // 2. fewest floors
+  // 3. fewest floors
   const minF = Math.min(...worlds.map(w => w.m.footprint_3m));
-  const m2 = { title: 'FEWEST FLOORS', text: 'Find the future with the FEWEST map cells that reach one full floor (3 m). Think about where the buildings go.',
+  const m3 = { id: 'floors', level: 'Medium', title: 'FEWEST TALL SPOTS',
+    text: 'Find the future with the FEWEST map squares that are at least one floor high (3 m). Think about where the buildings go.',
     ok: w => w.m.footprint_3m <= minF * 1.02,
-    feedback: w => `TOO MANY TALL CELLS: ${w.m.footprint_3m} reach 3 m. A better world has about ${pct((1 - minF / w.m.footprint_3m) * 100)}% fewer.` };
+    feedback: w => `TOO MANY: ${w.m.footprint_3m} squares reach one floor. A better world has about ${pct((1 - minF / w.m.footprint_3m) * 100)}% fewer.` };
 
-  // 3. biggest volume (exact V(t)): decided by the SSP; the three shapes give the same total
+  // 4. biggest volume: decided by the SSP; the three shapes give the same total
   const maxV = Math.max(...worlds.map(w => w.m.volume));
   const sameAcrossShapes = SSP_ORDER.every(s => {
     const v = worlds.filter(w => w.ssp === s).map(w => w.m.volume);
     return Math.max(...v) - Math.min(...v) <= 0.005 * Math.max(...v);
   });
-  const m3 = { title: 'BUILD BIG', text: 'Build the BIGGEST city: the most built volume in 2100. What matters most, society or shape?',
+  const m4 = { id: 'big', level: 'Medium', title: 'BUILD BIG',
+    text: 'Build the BIGGEST city: the most building in total ("volume") in 2100. What matters more: the society or the shape?',
     ok: w => w.m.volume >= maxV * 0.9999,
-    feedback: w => `Not the biggest. This world builds ${pct(w.m.volume / maxV * 100)}% of the largest possible volume.`,
-    twist: sameAcrossShapes ? () => 'LOOK: for a given society, sprawl, historical and vertical build the SAME total volume. The shape changes where it goes, not how much is built.' : null };
+    feedback: w => `Not the biggest. This world has ${pct(w.m.volume / maxV * 100)}% of the biggest possible volume.`,
+    twist: sameAcrossShapes ? () => 'LOOK: for the same society, sprawl, historical and vertical build the SAME total. The shape changes WHERE the buildings go, not HOW MUCH is built.' : null };
 
-  // 4. no new land AND a lot of volume (threshold made so that only 1-3 worlds win)
+  // 5. no new land AND a lot of volume
   const cand = worlds.filter(noNewLand).sort((a, b) => b.m.volume - a.m.volume);
   let k = 1, bestGap = -1;
   for (let i = 1; i <= Math.min(3, cand.length - 1); i++) {
@@ -451,31 +501,35 @@ function buildMissions(cityKey) {
     if (i >= 2 && gap > bestGap) { bestGap = gap; k = i; }
   }
   if (cand.length < 3) k = Math.max(1, cand.length - 1);
-  const thr = cand.length > k ? (cand[k - 1].m.volume + cand[k].m.volume) / 2 : cand[k - 1].m.volume;
+  const thr = cand.length ? (cand.length > k ? (cand[k - 1].m.volume + cand[k].m.volume) / 2 : cand[k - 1].m.volume) : Infinity;
   const need = (thr / base.volume - 1) * 100;
-  const m4 = { title: 'UP, NOT OUT', text: `Use NO NEW LAND and grow the built volume by at least +${need.toFixed(1)}% compared with 2015. Two rules, few answers.`,
+  const m5 = { id: 'updown', level: 'Hard', title: 'UP, NOT OUT',
+    text: `No new ground, and build at least ${need.toFixed(1)}% MORE total volume than in 2015. Two rules, few answers.`,
     ok: w => noNewLand(w) && w.m.volume >= thr,
     feedback: w => !noNewLand(w)
-      ? `YOU USED NEW LAND (+${pct((w.m.footprint_01 / base.footprint_01 - 1) * 100)}%). This mission allows none.`
+      ? `YOU USED NEW GROUND (+${pct((w.m.footprint_01 / base.footprint_01 - 1) * 100)}%). This mission allows none.`
       : `NOT ENOUGH GROWTH: +${((w.m.volume / base.volume - 1) * 100).toFixed(1)}% volume, you need +${need.toFixed(1)}%.` };
 
-  // 5. boss: most land (then the twist)
+  // 6. boss
   const widest = worlds.reduce((a, b) => (b.m.footprint_01 > a.m.footprint_01 ? b : a));
-  const m5 = { title: 'BOSS: LAND GRAB', text: 'BOSS: cover the MOST land in 2100. But what exactly counts as land?',
+  const m6 = { id: 'boss', level: 'Hardest', title: 'BOSS: GROUND GRAB',
+    text: 'BOSS: cover the MOST ground in 2100. But what exactly counts as "ground"?',
     ok: w => w === widest,
-    feedback: w => `Not the widest. This world covers ${pct(w.m.footprint_01 / widest.m.footprint_01 * 100)}% of the largest possible area.`,
+    feedback: w => `Not the widest. This world covers ${pct(w.m.footprint_01 / widest.m.footprint_01 * 100)}% of the biggest possible area.`,
     twist: w => {
       const rank = worlds.slice().sort((a, b) => b.m.footprint_3m - a.m.footprint_3m).indexOf(w) + 1;
-      return `TWIST! Count only cells with at least one floor (3 m) and this same world ranks ${rank} of 15 for land covered. Where you draw the line changes the answer.`;
+      return `TWIST! If you only count squares with at least one floor (3 m), this same world ranks ${rank} of 15 for ground covered. Where you draw the line changes the answer.`;
     } };
 
-  const list = [m1, m2, m3, m4, m5];
-  list.forEach(ms => { ms.solutions = worlds.filter(ms.ok); });
-  return list.every(ms => ms.solutions.length >= 1) ? list : null;
+  const list = [m0, m1, m2, m3, m4, m5, m6].filter(ms => { ms.solutions = worlds.filter(ms.ok); return ms.solutions.length >= 1; });
+  return list.length >= 5 && list[0].id === 'trend' ? list : null;
 }
 
+const cityTotal = (store, cityKey) => Object.values(store.progress[cityKey] || {}).reduce((s, r) => s + (r.score || 0), 0);
+const cityDone = (store, cityKey, list) => !!list && list.every(ms => { const r = (store.progress[cityKey] || {})[ms.id]; return r && r.medal !== 'skip'; });
+
 // ---------- Mission list ----------
-const pm = { list: null, idx: 0, lives: 3, tries: 0, hint: false, pred: null, ssp: null, path: null, done: false };
+const pm = { list: null, idx: 0, lives: 3, fails: 0, hint: false, ssp: null, path: null, done: false, lastTest: null };
 
 async function renderMissionList() {
   await metricsReady;
@@ -486,16 +540,17 @@ async function renderMissionList() {
     box.innerHTML = '<div class="dialog"><p>Missions need data/bars/metrics.json for this city. Run prepare_bars.py and reload.</p></div>';
     return;
   }
-  const prog = loadStore().progress[state.cityKey] || {};
+  const store = loadStore(), prog = store.progress[state.cityKey] || {};
+  $('missions-total').textContent = 'TOTAL SCORE: ' + cityTotal(store, state.cityKey);
   pm.list.forEach((ms, i) => {
     const b = document.createElement('button');
     b.className = 'mission-row';
-    const locked = i > 0 && !prog[i - 1];
+    const locked = i > 0 && !prog[pm.list[i - 1].id];
     b.disabled = locked;
-    const r = prog[i];
+    const r = prog[ms.id];
     const medal = r ? `<span class="medal ${r.medal}">${r.medal === 'skip' ? 'SKIPPED' : r.medal.toUpperCase() + ' ' + r.score}</span>`
                     : `<span class="medal">${locked ? 'LOCKED' : 'NEW'}</span>`;
-    b.innerHTML = `<span class="n">${i + 1}</span><span class="t"><b>${ms.title}</b><small>${i === 4 ? 'The hardest one.' : ['Easy', 'Easy', 'Medium', 'Hard'][i]}</small></span>${medal}`;
+    b.innerHTML = `<span class="n">${i + 1}</span><span class="t"><b>${ms.title}</b><small>${ms.level}</small></span>${medal}`;
     b.addEventListener('click', () => startMission(i));
     box.appendChild(b);
   });
@@ -504,48 +559,61 @@ async function renderMissionList() {
 // ---------- Play a mission ----------
 (function buildPlayPickers() {
   const box = $('pm-ssp');
-  SSP_ORDER.forEach(s => { const b = document.createElement('button'); b.dataset.pmSsp = s; b.textContent = s; box.appendChild(b); });
+  SSP_ORDER.forEach(s => {
+    const b = document.createElement('button'); b.dataset.pmSsp = s;
+    b.innerHTML = `${s}<small>${SSP_INFO[s].name}</small>`; box.appendChild(b);
+  });
 })();
 
 function setSelected(containerId, key, value) {
   document.querySelectorAll(`#${containerId} button`).forEach(b => b.classList.toggle('selected', b.dataset[key] === value));
 }
 
+// points you would get if you found the answer on your next test
+const pointsNow = () => Math.max(10, 100 - 25 * pm.fails - (pm.hint ? 20 : 0));
+function showPoints(final) {
+  const el = $('pm-score');
+  el.textContent = (final === undefined ? 'POINTS: ' : 'EARNED: ') + (final === undefined ? pointsNow() : final);
+  el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
+}
+function showTotal() { $('pm-total').textContent = 'TOTAL: ' + cityTotal(loadStore(), state.cityKey); }
 function updatePlayHud() {
   $('pm-lives').textContent = 'LIVES: ' + '■'.repeat(pm.lives) + '·'.repeat(3 - pm.lives);
-  $('pm-try').textContent = 'TRY ' + Math.max(1, pm.tries + (pm.done ? 0 : 1));
-  $('pm-run').disabled = !(pm.ssp && pm.path) || pm.done || pm.lives === 0;
+  $('pm-try').textContent = 'WRONG TESTS: ' + pm.fails;
 }
-function missionScore() { return Math.max(10, 100 - 25 * (pm.tries - 1) - (pm.hint ? 20 : 0)); }
+const locked = () => pm.done || pm.lives === 0;
 
 function startMission(i) {
-  Object.assign(pm, { idx: i, lives: 3, tries: 0, hint: false, pred: null, ssp: null, path: null, done: false });
+  Object.assign(pm, { idx: i, lives: 3, fails: 0, hint: false, ssp: null, path: null, done: false, lastTest: null });
   const ms = pm.list[i];
   $('pm-title').textContent = `MISSION ${i + 1}: ${ms.title}`;
   $('pm-text').textContent = ms.text;
-  $('pm-score').textContent = 'SCORE: 100';
-  $('pm-predict-box').hidden = false;
-  $('pm-verdict').textContent = 'Pick your world and press RUN.';
+  $('pm-verdict').textContent = 'Pick a society (SSP) and a shape. The test starts as soon as you have picked both.';
   $('pm-verdict-box').className = 'dialog';
+  $('pm-explain').textContent = TEXTS.pickExplain;
   ['pm-retry', 'pm-skip', 'pm-next'].forEach(id => { $(id).hidden = true; });
   $('pm-hint').disabled = false;
   document.querySelectorAll('#screen-play button.selected').forEach(b => b.classList.remove('selected'));
   const c = $('canvas3'); c.width = 320; c.height = 192; c.getContext('2d').clearRect(0, 0, 320, 192);
   $('pm-source').textContent = '';
   showScreen('screen-play');
-  updatePlayHud();
+  updatePlayHud(); showPoints(); showTotal();
+  if (!Guide.seen) { Guide.open = true; Guide.seen = true; try { localStorage.setItem('guide_seen', '1'); } catch (e) { /* ignore */ } syncGuide(); }
 }
 
-document.querySelectorAll('#pm-predict button').forEach(b => b.addEventListener('click', () => {
-  pm.pred = b.dataset.pred; setSelected('pm-predict', 'pred', pm.pred);
-}));
+// pick a society or a shape: read about it, and test as soon as both are chosen
+function explain(text) { $('pm-explain').textContent = text; }
 $('pm-ssp').addEventListener('click', e => {
-  const b = e.target.closest('button'); if (!b || pm.done) return;
-  pm.ssp = b.dataset.pmSsp; setSelected('pm-ssp', 'pmSsp', pm.ssp); updatePlayHud();
+  const b = e.target.closest('button'); if (!b || locked()) return;
+  pm.ssp = b.dataset.pmSsp; setSelected('pm-ssp', 'pmSsp', pm.ssp); explain(TEXTS.ssp[pm.ssp]); testNow();
 });
 document.querySelectorAll('#pm-path button').forEach(b => b.addEventListener('click', () => {
-  if (pm.done) return;
-  pm.path = b.dataset.pmPath; setSelected('pm-path', 'pmPath', pm.path); updatePlayHud();
+  if (locked()) return;
+  pm.path = b.dataset.pmPath; setSelected('pm-path', 'pmPath', pm.path); explain(TEXTS.pathway[pm.path]); testNow();
+}));
+document.querySelectorAll('#pm-ssp, #pm-path').forEach(box => box.addEventListener('mouseover', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.pmSsp) explain(TEXTS.ssp[b.dataset.pmSsp]); else if (b.dataset.pmPath) explain(TEXTS.pathway[b.dataset.pmPath]);
 }));
 
 $('pm-hint').addEventListener('click', () => {
@@ -553,29 +621,29 @@ $('pm-hint').addEventListener('click', () => {
   pm.hint = true;
   const ms = pm.list[pm.idx];
   const shapes = [...new Set(ms.solutions.map(s => s.path))], ssps = [...new Set(ms.solutions.map(s => s.ssp))];
-  $('pm-verdict').textContent = shapes.length === 1
-    ? `HINT (-20 points): the answer uses the ${shapes[0].toUpperCase()} shape.`
-    : ssps.length === 1 ? `HINT (-20 points): the answer is society ${ssps[0]}. The shape does not matter here.`
+  const only = ms.solutions.length === 1 ? ms.solutions[0] : null;
+  $('pm-verdict').textContent = only
+    ? `HINT (-20 points): the answer is ${only.ssp} + ${only.path.toUpperCase()}.`
+    : shapes.length === 1 ? `HINT (-20 points): the answer uses the ${shapes[0].toUpperCase()} shape.`
+    : ssps.length === 1 ? `HINT (-20 points): the answer uses society ${ssps[0]}. The shape does not matter here.`
     : `HINT (-20 points): look at the ${ms.solutions[0].path.toUpperCase()} shape.`;
   $('pm-hint').disabled = true;
-  $('pm-score').textContent = 'SCORE: ' + missionScore();
+  showPoints();
 });
 
-$('pm-run').addEventListener('click', () => {
-  if (pm.done || pm.lives === 0 || !(pm.ssp && pm.path)) return;
-  pm.tries++;
-  $('pm-predict-box').hidden = true;
+function testNow() {
+  if (locked() || !(pm.ssp && pm.path)) return;
+  const id = `${pm.ssp}|${pm.path}`;
+  if (pm.lastTest === id) return;                      // same world twice: no second test
+  pm.lastTest = id;
   state.ssp = pm.ssp; state.pathway = pm.path;
   drawFrame($('canvas3'), 2100, $('pm-source'), false);
   const ms = pm.list[pm.idx];
-  const w = ms.solutions.concat([]).find(s => s.ssp === pm.ssp && s.path === pm.path)
-         || { ssp: pm.ssp, path: pm.path, m: metrics[state.cityKey][`ours|${pm.ssp}|${pm.path}|2100`] };
-  const win = ms.ok(worldOf(pm.ssp, pm.path));
+  const w = findWorld(pm.ssp, pm.path);
   markExplored();
-  if (win) onWin(ms, w); else onMiss(ms);
-});
-function worldOf(ssp, path) {
-  return pm.list.__worlds && pm.list.__worlds[`${ssp}|${path}`] || findWorld(ssp, path);
+  const store = loadStore(); store.stats.tests = (store.stats.tests || 0) + 1; saveStore(store);
+  if (ms.ok(w)) onWin(ms, w); else onMiss(ms, w);
+  $('pm-verdict-box').scrollIntoView({ block: 'nearest', behavior: 'smooth' });   // the result is below the picture
 }
 function findWorld(ssp, path) {
   // the same world objects used inside buildMissions (identity matters for "best" checks)
@@ -583,76 +651,92 @@ function findWorld(ssp, path) {
   return { ssp, path, m: metrics[state.cityKey][`ours|${ssp}|${path}|2100`] };
 }
 
-function onMiss(ms) {
-  pm.lives--;
-  const w = findWorld(pm.ssp, pm.path);
+function onMiss(ms, w) {
+  if (!ms.free) { pm.lives--; pm.fails++; }              // the first (tutorial) mission costs nothing
   let msg = ms.feedback(w);
   $('pm-verdict-box').className = 'dialog lose-state';
-  if (pm.lives > 0) msg += ` ${pm.lives} ${pm.lives === 1 ? 'LIFE' : 'LIVES'} LEFT.`;
+  if (ms.free) msg += ' No lives lost here: this one is just to learn. Try again!';
+  else if (pm.lives > 0) msg += ` ${pm.lives} ${pm.lives === 1 ? 'LIFE' : 'LIVES'} LEFT. Change your SSP or your shape to test again.`;
   else {
     msg += ' NO LIVES LEFT.';
     $('pm-retry').hidden = false; $('pm-skip').hidden = false;
   }
   $('pm-verdict').textContent = msg;
-  $('pm-score').textContent = 'SCORE: ' + missionScore();
-  updatePlayHud();
+  updatePlayHud(); showPoints();
 }
 
 function onWin(ms, w) {
   pm.done = true;
   const store = loadStore();
-  const shapeMatters = new Set(ms.solutions.map(s => s.path)).size < 3;
-  const predicted = shapeMatters && pm.pred && pm.pred === pm.path;
-  const score = missionScore() + (predicted ? 25 : 0);
-  const medal = pm.tries === 1 && !pm.hint ? 'gold' : pm.tries <= 2 ? 'silver' : 'bronze';
+  const score = pointsNow();
+  const medal = pm.fails === 0 && !pm.hint ? 'gold' : pm.fails <= 1 ? 'silver' : 'bronze';
   const prog = store.progress[state.cityKey] = store.progress[state.cityKey] || {};
-  const prev = prog[pm.idx];
-  if (!prev || prev.medal === 'skip' || score > prev.score) prog[pm.idx] = { medal, score };
-  if (predicted) store.stats.pred = (store.stats.pred || 0) + 1;
+  const prev = prog[ms.id];
+  if (!prev || prev.medal === 'skip' || score > prev.score) prog[ms.id] = { medal, score };
 
   const newBadges = [];
   const give = id => { if (!store.badges[id]) { store.badges[id] = true; newBadges.push(BADGE_DEFS[id][0]); } };
   give('first_win');
   if (medal === 'gold') give('gold');
-  if (store.stats.pred >= 3) give('oracle');
-  if (pm.idx === 4) give('floor_spotter');
-  if ([0, 1, 2, 3, 4].every(i => prog[i] && prog[i].medal !== 'skip')) give('master');
-  if (CITY_LIST.every(c => store.progress[c] && [0, 1, 2, 3, 4].every(i => store.progress[c][i] && store.progress[c][i].medal !== 'skip'))) give('globetrotter');
+  if ((store.stats.tests || 0) >= 25) give('tester');
+  if (ms.id === 'boss') give('floor_spotter');
+  if (cityDone(store, state.cityKey, pm.list)) give('master');
+  if (CITY_LIST.every(c => cityDone(store, c, buildMissions(c)))) give('globetrotter');
   saveStore(store);
 
   let msg = `MISSION COMPLETE! ${medal.toUpperCase()} MEDAL, ${score} POINTS.`;
-  if (predicted) msg += ' YOUR PREDICTION WAS RIGHT (+25).';
   if (ms.twist) msg += ' ' + ms.twist(w);
   if (newBadges.length) msg += ' NEW BADGE: ' + newBadges.join(', ') + '.';
   $('pm-verdict').textContent = msg;
   $('pm-verdict-box').className = 'dialog win-state';
-  $('pm-score').textContent = 'SCORE: ' + score;
   $('pm-next').hidden = false;
-  $('pm-next').textContent = pm.idx < 4 ? 'NEXT MISSION ▶' : 'BACK TO LIST ▶';
+  $('pm-next').textContent = pm.idx < pm.list.length - 1 ? 'NEXT MISSION ▶' : 'BACK TO LIST ▶';
   $('pm-hint').disabled = true;
-  updatePlayHud();
+  updatePlayHud(); showPoints(score); showTotal();
 }
 
 $('pm-retry').addEventListener('click', () => {
-  pm.lives = 3; $('pm-retry').hidden = true; $('pm-skip').hidden = true;
-  $('pm-verdict').textContent = 'New lives. The score keeps dropping with every try, so think first.';
+  pm.lives = 3; pm.lastTest = null; $('pm-retry').hidden = true; $('pm-skip').hidden = true;
+  $('pm-verdict').textContent = 'New lives. Each wrong test makes the points smaller, so think first. Pick a new world.';
   $('pm-verdict-box').className = 'dialog';
-  updatePlayHud();
+  updatePlayHud(); showPoints();
 });
 $('pm-skip').addEventListener('click', () => {
   const ms = pm.list[pm.idx], a = ms.solutions[0];
   const store = loadStore();
   const prog = store.progress[state.cityKey] = store.progress[state.cityKey] || {};
-  if (!prog[pm.idx]) prog[pm.idx] = { medal: 'skip', score: 0 };
+  if (!prog[ms.id]) prog[ms.id] = { medal: 'skip', score: 0 };
   saveStore(store);
   pm.done = true;
   $('pm-verdict').textContent = `ONE ANSWER WAS: ${a.ssp} + ${a.path.toUpperCase()}. The next mission is unlocked.`;
   $('pm-retry').hidden = true; $('pm-skip').hidden = true; $('pm-next').hidden = false;
-  $('pm-next').textContent = pm.idx < 4 ? 'NEXT MISSION ▶' : 'BACK TO LIST ▶';
+  $('pm-next').textContent = pm.idx < pm.list.length - 1 ? 'NEXT MISSION ▶' : 'BACK TO LIST ▶';
   updatePlayHud();
 });
-$('pm-next').addEventListener('click', () => { if (pm.idx < 4) startMission(pm.idx + 1); else showScreen('screen-missions'); });
+$('pm-next').addEventListener('click', () => { if (pm.idx < pm.list.length - 1) startMission(pm.idx + 1); else showScreen('screen-missions'); });
 $('pm-back').addEventListener('click', () => showScreen('screen-missions'));
+
+// ---------- Guide window: what do SSP, sprawl, historical... mean? ----------
+const Guide = { open: false, seen: false };
+try { Guide.seen = localStorage.getItem('guide_seen') === '1'; } catch (e) { /* ignore */ }
+(function buildGuide() {
+  const g = TEXTS.guide;
+  const rows = (obj, names) => Object.entries(obj).map(([k, v]) => `<dt>${names[k]}</dt><dd>${v}</dd>`).join('');
+  $('guide-body').innerHTML =
+    `<h3>WHAT IS AN SSP?</h3><p>${g.sspIntro}</p><dl>${rows(g.ssp, g.sspNames)}</dl>` +
+    `<h3>HOW DOES THE CITY GROW?</h3><p>${g.shapeIntro}</p><dl>${rows(g.shape, g.shapeNames)}</dl>` +
+    `<h3>WORDS YOU WILL SEE</h3><dl>${rows(g.words, g.wordNames)}</dl>` +
+    `<h3>TIP</h3><p>${g.tip}</p>`;
+})();
+const GUIDE_SCREENS = ['screen-play', 'screen-world', 'screen-missions'];
+function syncGuide() {
+  const show = Guide.open && GUIDE_SCREENS.includes(document.body.dataset.screen);
+  $('guide').hidden = !show;
+  document.body.classList.toggle('guide-open', show);      // pushes the game window to the left so the guide sits beside it
+  document.querySelectorAll('.guide-toggle').forEach(b => b.classList.toggle('selected', Guide.open));
+}
+document.querySelectorAll('.guide-toggle').forEach(b => b.addEventListener('click', () => { Guide.open = !Guide.open; syncGuide(); }));
+$('guide-close').addEventListener('click', () => { Guide.open = false; syncGuide(); });
 
 // ---------- Badges screen ----------
 function renderBadges() {

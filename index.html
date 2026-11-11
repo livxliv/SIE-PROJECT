@@ -89,8 +89,8 @@
       <div class="win-body">
         <h2>HOW DO YOU WANT TO PLAY?</h2>
         <div class="cards">
-          <button class="card" data-goto="screen-world"><b>FREE EXPLORE</b><span>Try any of the 15 futures of your city and collect them all.</span></button>
-          <button class="card" id="to-missions" data-goto="screen-missions"><b>MISSIONS</b><span>Solve puzzles, predict the winner, lose lives, earn badges.</span></button>
+          <button class="card" data-goto="screen-world"><b>FREE EXPLORE</b><span>Try all 15 possible futures of your city, at your own pace.</span></button>
+          <button class="card" id="to-missions" data-goto="screen-missions"><b>MISSIONS</b><span>Solve small puzzles, earn points and badges. A guide explains every word.</span></button>
         </div>
       </div>
     </div>
@@ -103,9 +103,11 @@
       <div class="win-body">
         <h2>MISSIONS</h2>
         <p class="lead" id="missions-city"></p>
+        <p class="lead" id="missions-total"></p>
         <div id="mission-list"></div>
         <div class="choices">
           <button data-goto="screen-mode">&#9664; BACK</button>
+          <button class="guide-toggle">? GUIDE</button>
           <button data-goto="screen-badges">BADGES</button>
         </div>
       </div>
@@ -120,33 +122,27 @@
         <div class="hud">
           <div class="chip" id="pm-lives"></div>
           <div class="chip" id="pm-try"></div>
-          <div class="chip" id="pm-score"></div>
+          <div class="chip bumpable" id="pm-score"></div>
+          <div class="chip" id="pm-total"></div>
+          <button class="hud-btn guide-toggle">? GUIDE</button>
         </div>
         <div class="dialog"><p id="pm-text"></p></div>
 
-        <div id="pm-predict-box">
-          <h2>YOUR PREDICTION: WHICH SHAPE WINS?</h2>
-          <div class="choices" id="pm-predict">
-            <button data-pred="sprawl">SPRAWL</button>
-            <button data-pred="historical">HISTORICAL</button>
-            <button data-pred="vertical">VERTICAL</button>
-          </div>
-        </div>
-
-        <h2>PICK YOUR WORLD</h2>
+        <h2>1. PICK A SOCIETY (SSP)</h2>
         <div class="choices" id="pm-ssp"></div>
+        <h2>2. PICK A SHAPE</h2>
         <div class="choices" id="pm-path">
-          <button data-pm-path="sprawl">SPRAWL</button>
-          <button data-pm-path="historical">HISTORICAL</button>
-          <button data-pm-path="vertical">VERTICAL</button>
+          <button data-pm-path="sprawl">SPRAWL<small>SPREAD OUT</small></button>
+          <button data-pm-path="historical">HISTORICAL<small>LIKE IN THE PAST</small></button>
+          <button data-pm-path="vertical">VERTICAL<small>BUILD UP</small></button>
         </div>
+        <div class="dialog explain"><p id="pm-explain"></p></div>
         <div class="choices">
-          <button id="pm-run" disabled>RUN &#9654;</button>
           <button id="pm-hint">HINT (-20)</button>
         </div>
 
         <div class="stage" id="pm-stage"><canvas id="canvas3" width="320" height="192"></canvas></div>
-        <div class="legend"><span class="legend-label">2100</span><span class="chip" id="pm-source"></span></div>
+        <div class="legend"><span class="legend-label">THE CITY IN 2100</span><span class="chip" id="pm-source"></span></div>
         <div class="dialog" id="pm-verdict-box"><p id="pm-verdict"></p></div>
         <div class="choices">
           <button id="pm-retry" hidden>RETRY MISSION</button>
@@ -176,17 +172,18 @@
       <div class="win-bar"><span>CHOOSE_YOUR_WORLD.EXE</span><i></i><i></i><i></i></div>
       <div class="win-body">
         <p class="lead" data-text="mission"></p>
-        <h2>1. WHAT KIND OF SOCIETY?</h2>
+        <h2>1. WHAT KIND OF WORLD? (SSP)</h2>
+        <button class="hud-btn guide-toggle">? WHAT DO THESE WORDS MEAN?</button>
         <div class="ssp-cards" id="ssp-choices"></div>
         <p class="legend-icons">
-          <span class="ico" data-ico="people"></span> POPULATION
-          <span class="ico" data-ico="coin"></span> ECONOMIC GROWTH
-          <span class="ctx"><span class="ico" data-ico="co2"></span> CO&#8322; (CONTEXT ONLY)</span>
+          <span class="ico" data-ico="people"></span> PEOPLE
+          <span class="ico" data-ico="coin"></span> MONEY (ECONOMIC GROWTH)
+          <span class="ctx"><span class="ico" data-ico="co2"></span> CO&#8322; (JUST FOR INFO)</span>
         </p>
         <h2>2. HOW DOES THE CITY GROW?</h2>
         <div class="path-cards" id="path-choices">
           <button data-pathway="sprawl"><span class="ico big" data-ico="sprawl"></span>SPRAWL<small>SPREADS OUT</small></button>
-          <button data-pathway="historical"><span class="ico big" data-ico="mix"></span>HISTORICAL<small>AS BEFORE</small></button>
+          <button data-pathway="historical"><span class="ico big" data-ico="mix"></span>HISTORICAL<small>LIKE 1980-2015</small></button>
           <button data-pathway="vertical"><span class="ico big" data-ico="tower"></span>VERTICAL<small>BUILDS UP</small></button>
         </div>
         <div class="explore">
@@ -258,6 +255,11 @@
       </div>
     </div>
   </section>
+
+  <div class="vt-window guide" id="guide" hidden>
+    <div class="win-bar vt-bar"><span>GUIDE.EXE</span><button class="vt-close" id="guide-close" aria-label="Close guide"></button></div>
+    <div class="vt-body guide-body" id="guide-body"></div>
+  </div>
 
   <div id="map3d" hidden></div>
 
