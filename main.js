@@ -337,8 +337,8 @@ function resetGame() {
 
 
 // =====================================================================
-//  MUSIC: a tiny original chiptune loop made with the Web Audio API
-//  (no audio files, so no licence to credit). Starts after PRESS START.
+//  MUSIC: assets/music.mp3 (Think Factory, Eldorado, PremiumBeat), looped.
+//  If the file is missing, a tiny chiptune loop is used instead. Starts after PRESS START.
 // =====================================================================
 const Music = (() => {
   let ctx = null, master = null, timer = null, step = 0, on = true, started = false;
@@ -358,12 +358,15 @@ const Music = (() => {
     step++;
   }
   function label() { $('mute').textContent = on ? '♪ ON' : '♪ OFF'; }
+  const song = new Audio('assets/music.mp3'); song.loop = true; song.volume = 0.5; let songOk = true;
+  song.addEventListener('error', () => { songOk = false; if (on && started) play(); });
   function play() {
+    if (songOk) { song.play().catch(() => {}); return; }
     if (!ctx) { ctx = new (window.AudioContext || window.webkitAudioContext)(); master = ctx.createGain(); master.gain.value = 0.5; master.connect(ctx.destination); }
     if (ctx.state === 'suspended') ctx.resume();
     if (!timer) timer = setInterval(tick, 230);
   }
-  function stop() { clearInterval(timer); timer = null; }
+  function stop() { song.pause(); clearInterval(timer); timer = null; }
   return {
     start() { started = true; if (on) play(); label(); },
     toggle() {
@@ -771,9 +774,9 @@ async function drawVt(level, year) {
 // ---------- Map view and 3D bars (same data, same map) ----------
 const BASEMAPS = { dark: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
                    light: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json' };
-const Bars = { map: null, overlay: null, mode: 'map', hideLow: false, exag: 10, opacity: 0.85, base: 'dark',
+const Bars = { map: null, overlay: null, mode: 'map', hideLow: false, exag: 100, opacity: 0.85, base: 'dark',
                level: 1, lastYear: 1980, fitted: null };
-const EXAG = [5, 10, 20];
+const EXAG = [50, 100, 200];
 const NEXT_MODE = { pixel: 'map', map: '3d', '3d': 'pixel' };
 const MODE_LABEL = { pixel: 'PIXEL VIEW', map: 'MAP VIEW', '3d': '3D VIEW' };
 
@@ -799,7 +802,7 @@ function pickField(meta, level, year) {
   const y = ys.reduce((best, c) => (Math.abs(c - year) < Math.abs(best - year) ? c : best), ys[0]);
   return { name: `ours_${state.ssp}_${state.pathway}_${y}`, year: y };
 }
-const viewPose = () => (Bars.mode === '3d' ? { pitch: 55, bearing: -20 } : { pitch: 0, bearing: 0 });
+const viewPose = () => (Bars.mode === '3d' ? { pitch: 60, bearing: -20 } : { pitch: 0, bearing: 0 });
 
 function ensureMap() {
   if (Bars.map) return true;
@@ -836,7 +839,7 @@ async function renderBars(level, year) {
   const is3d = Bars.mode === '3d';
   note.textContent = (year > 2015 && fld.year !== year ? `SNAPSHOT: ${fld.year}` : 'REAL DATA') + (is3d ? ` | HEIGHT x${Bars.exag}` : ' | 500 M BLOCKS');
   document.querySelectorAll('.legend-max').forEach(el => { el.textContent = meta.hmax.toFixed(0) + ' M'; });
-  const half = meta.block_m / 2 * (is3d ? 0.9 : 1.0);
+  const half = meta.block_m / 2 * (is3d ? 0.55 : 1.0);
   Bars.overlay.setProps({ layers: [new deck.ColumnLayer({
     id: 'bars', data, diskResolution: 4, angle: 45, radius: half * Math.SQRT2, extruded: is3d, flatShading: true,
     getPosition: d => d.p, getElevation: d => d.h, elevationScale: Bars.exag, opacity: Bars.opacity,
