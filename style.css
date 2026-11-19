@@ -239,7 +239,7 @@ button[hidden], #pm-predict-box[hidden] { display: none; }
 
 /* ---------- 3D view ---------- */
 .hud-btn { font-size: 8px; padding: 6px 10px; }
-.stage.is3d canvas#canvas1, .stage.is3d canvas#canvas2 { display: none !important; }
+.stage.is3d canvas#canvas1, .stage.is3d canvas#canvas2, .stage.is3d canvas#canvas3 { display: none !important; }
 #map3d { display: none; width: 100%; height: 52vh; min-height: 320px; background: var(--c-night); }
 .stage.is3d #map3d { display: block; }
 .tools3d { display: none; gap: 8px; justify-content: center; flex-wrap: wrap; }
@@ -289,3 +289,38 @@ body.view3d .legend-bar { background: linear-gradient(to right, #5e70a6, #9ec6c9
 .guide-body dd { margin: 2px 0 0; }
 @media (max-width: 700px) { .guide { left: 8px; right: 8px; top: auto; bottom: 8px; width: auto; max-height: 60vh; } .guide-body { max-height: 45vh; } }
 @media (min-width: 1000px) { body.guide-open .screen { padding-right: 432px; } }
+
+
+/* ---------- docked V(t) window ---------- */
+.vt-window.vt:not(.floating) { position: static; width: auto; box-shadow: none; }
+.vt-window.vt.floating { position: fixed; z-index: 6; }
+.vt-window.guide { position: fixed; }
+
+
+/* ---------- time travel: big year, big call-to-action, clickable dates ---------- */
+.stage { position: relative; }
+.year-big { position: absolute; top: 18px; left: 20px; z-index: 5; pointer-events: none; font-family: var(--font-title); font-size: clamp(22px, 5vw, 40px);
+  padding: 8px 12px 6px; background: rgba(40, 20, 31, .85); border: var(--px) solid var(--c-teal-200); color: var(--c-ice); text-shadow: 3px 3px 0 var(--c-night); }
+.year-big::after { content: attr(data-tag); display: block; font-size: 8px; margin-top: 6px; color: var(--c-teal-200); }
+.year-big.model { border-color: var(--c-peach); color: var(--c-peach); }
+.year-big.model::after { color: var(--c-peach); }
+.year-big.bump { animation: bump .45s ease-out; }
+.time-box { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 8px; background: var(--c-night); border: var(--px) solid var(--c-indigo-700); }
+.time-prompt { margin: 0; text-align: center; font-family: var(--font-title); font-size: 11px; color: var(--c-ice); }
+.time-prompt span { color: var(--c-peach); display: inline-block; }
+.time-box.nudge { border-color: var(--c-peach); }
+.time-box.nudge .time-prompt { color: var(--c-peach); }
+.time-box.nudge .time-prompt span:first-child { animation: nudge-l 1s steps(2, start) infinite; }
+.time-box.nudge .time-prompt span:last-child { animation: nudge-r 1s steps(2, start) infinite; }
+@keyframes nudge-l { 50% { transform: translateX(-8px); } }
+@keyframes nudge-r { 50% { transform: translateX(8px); } }
+.time-box.nudge input.tl::-webkit-slider-thumb { animation: ping 1s steps(2, start) infinite; }
+.time-box.nudge input.tl::-moz-range-thumb { animation: ping 1s steps(2, start) infinite; }
+@keyframes ping { 0% { box-shadow: 0 0 0 0 var(--c-peach); } 100% { box-shadow: 0 0 0 10px transparent; } }
+.ticks { display: flex; justify-content: space-between; gap: 2px; }
+.tick { font-family: var(--font-title); font-size: 9px; padding: 6px 4px; background: transparent; color: var(--c-teal-200); border: 2px solid transparent; box-shadow: none; opacity: .65; cursor: pointer; }
+.tick.model { color: var(--c-peach); }
+.tick.on { opacity: 1; background: var(--c-teal-200); color: var(--c-night); border-color: var(--c-ice); font-size: 11px; }
+.tick.model.on { background: var(--c-peach); border-color: var(--c-peach); }
+@media (prefers-reduced-motion: reduce) { .time-box.nudge * , .year-big.bump { animation: none !important; } }
+@media (max-width: 700px) { .tick { font-size: 7px; padding: 6px 1px; } .tick.on { font-size: 8px; } }

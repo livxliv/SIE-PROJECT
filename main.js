@@ -57,12 +57,14 @@ const TEXTS = {
       historical: 'LIKE IN THE PAST. The city keeps its habits from 1980 to 2015: some new ground, some taller buildings. This is the "nothing changes" choice.',
       vertical: 'BUILD UP. New buildings go on land that is already built. Small on the map, but tall.',
     },
-    wordNames: { ground: 'GROUND', volume: 'VOLUME', floor: 'ONE FLOOR', square: 'SQUARE' },
+    wordNames: { ground: 'GROUND', volume: 'VOLUME', floor: 'ONE FLOOR', square: 'SQUARE', saved: 'LAND SAVED', warm: 'WARMING' },
     words: {
       ground: 'How much land has buildings on it, seen from above.',
       volume: 'How much building there is in total: the ground covered times the height.',
       floor: 'About 3 metres of height. A square lower than this is more like a low shed than a building.',
       square: 'One small piece of the map (a cell). The map is made of many squares.',
+      saved: 'How much less ground is covered, compared with the world that covers the most. More is better.',
+      warm: 'How much warming a world causes. Less is better. In the final mission, saving land and avoiding warming pull in different directions.',
     },
     tip: 'Not sure where to start? Try SSP2 + HISTORICAL first. It is the "keep going" future. Then ask: what changes if I pick another SSP, or another shape?',
   },
@@ -83,6 +85,10 @@ const cssVar = n => css.getPropertyValue(n).trim();
 const scale = Array.from({ length: 8 }, (_, i) => cssVar(`--scale-${i}`));
 
 const $ = id => document.getElementById(id);
+
+// Map libraries load in the background so the first screen shows immediately
+const libsReady = Promise.all(['https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js', 'https://unpkg.com/deck.gl@8.9.35/dist.min.js']
+  .map(src => new Promise(res => { const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = res; document.head.appendChild(s); })));
 
 // Fill every data-text="a.b" element
 document.querySelectorAll('[data-text]').forEach(el => {
@@ -300,21 +306,43 @@ function updateLevel1() {
   $('l1-year').textContent = year;
   $('l1-year').parentElement.className = 'chip year kind-obs';
   $('l1-dialog').textContent = TEXTS.history[year];
+  markTime('l1', year);
   drawFrame($('canvas1'), year, $('l1-source'), true);
   refreshViews(1, year);
 }
 function startLevel1() {
   $('l1-city').textContent = state.city.toUpperCase();
   updateLegends();
-  l1Slider.value = 0; updateLevel1();
+  l1Slider.value = 0; updateLevel1(); $('l1-time').classList.add('nudge');
 }
 l1Slider.addEventListener('input', updateLevel1);
+
+// Dates under the slider: click a date to jump there
+function buildTicks(id, years, slider, update) {
+  const box = $(id); box.innerHTML = '';
+  years.forEach((y, i) => {
+    const t = document.createElement('button');
+    t.type = 'button'; t.className = 'tick' + (y > 2015 ? ' model' : ''); t.textContent = y; t.dataset.year = y;
+    t.addEventListener('click', () => { slider.value = i; slider.dispatchEvent(new Event('input')); });
+    box.appendChild(t);
+  });
+}
+function markTime(prefix, year) {
+  document.querySelectorAll(`#${prefix}-ticks .tick`).forEach(t => t.classList.toggle('on', +t.dataset.year === year));
+  const big = $(`${prefix}-bigyear`);
+  big.textContent = year; big.className = `year-big ${year > 2015 ? 'model' : 'real'}`;
+  void big.offsetWidth; big.classList.add('bump');
+  big.dataset.tag = year > 2015 ? 'MODEL' : 'REAL DATA';
+}
+const stopNudge = id => $(id).classList.remove('nudge');
+l1Slider.addEventListener('input', () => stopNudge('l1-time'));
 
 // Level 2
 const l2Slider = $('l2-slider'); l2Slider.max = FUTURE_YEARS.length - 1;
 function updateLevel2() {
   const year = FUTURE_YEARS[l2Slider.value];
   $('l2-year').textContent = year;
+  markTime('l2', year);
   const kind = year <= 2015 ? 'obs' : 'sim';
   l2Slider.dataset.kind = kind;
   $('l2-year').parentElement.className = `chip year kind-${kind}`;
@@ -328,9 +356,12 @@ function updateLevel2() {
 function startLevel2() {
   $('l2-info').textContent = `${state.city.toUpperCase()} | ${state.ssp} | ${state.pathway.toUpperCase()}`;
   updateLegends();
-  l2Slider.value = 0; updateLevel2();
+  l2Slider.value = 0; updateLevel2(); $('l2-time').classList.add('nudge');
 }
 l2Slider.addEventListener('input', updateLevel2);
+buildTicks('l1-ticks', HISTORY_YEARS, l1Slider, updateLevel1);
+buildTicks('l2-ticks', FUTURE_YEARS, l2Slider, updateLevel2);
+l2Slider.addEventListener('input', () => stopNudge('l2-time'));
 
 function showEnding() {
   $('end-summary').textContent =
@@ -389,7 +420,7 @@ const Music = (() => {
     step++;
   }
   function label() { $('mute').textContent = on ? '♪ ON' : '♪ OFF'; }
-  const song = new Audio('assets/music.mp3'); song.loop = true; song.volume = 0.5; let songOk = true;
+  const song = new Audio(); song.preload = 'none'; song.src = 'assets/music.mp3'; song.loop = true; song.volume = 0.5; let songOk = true;
   song.addEventListener('error', () => { songOk = false; if (on && started) play(); });
   function play() {
     if (songOk) { song.play().catch(() => {}); return; }
@@ -427,12 +458,31 @@ function saveStore(s) { try { localStorage.setItem(MISSION_STORE, JSON.stringify
 let metrics = null;
 const metricsReady = fetch('data/bars/metrics.json').then(r => r.json()).then(j => { metrics = j; }).catch(() => { metrics = null; });   // exact numbers made by prepare_bars.py
 
+// ---- optional file from Martin: data/tradeoff.csv  (columns: city, ssp, pathway, land, warming; "land" is optional) ----
+const normKey = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+let tradeoff = null;
+const tradeoffReady = fetch('data/tradeoff.csv').then(r => { if (!r.ok) throw new Error('none'); return r.text(); }).then(txt => {
+  const rows = txt.trim().split(/\r?\n/).map(l => l.split(/[;,\t]/).map(x => x.trim().replace(/^"|"$/g, '')));
+  const head = rows.shift().map(normKey), col = n => head.findIndex(h => n.includes(h));
+  const ic = col(['city', 'country']), is = col(['ssp']), ip = col(['pathway', 'path', 'shape']), il = col(['land', 'land_use']), iw = col(['warming']);
+  if ([ic, is, ip, iw].some(i => i < 0)) throw new Error('bad header');
+  const out = {};
+  rows.forEach(r => {
+    const city = CITY_LIST.find(c => normKey(c) === normKey(r[ic])), w = parseFloat(r[iw]);
+    if (!city || !isFinite(w)) return;
+    const land = il >= 0 ? parseFloat(r[il]) : NaN;
+    (out[city] = out[city] || {})[`${r[is].toUpperCase()}|${r[ip].toLowerCase()}`] = { warming: w, land };
+  });
+  tradeoff = out;
+}).catch(() => { tradeoff = null; });
+
 const BADGE_DEFS = {
   first_win:     ['FIRST WIN',      'Complete your first mission.'],
   gold:          ['GOLD STANDARD',  'Win a mission on the first try, without a hint.'],
   tester:        ['TESTER',         'Test 25 different worlds in the missions.'],
   floor_spotter: ['FLOOR SPOTTER',  'Finish the boss mission and spot the twist.'],
   master:        ['CITY MASTER',    'Complete every mission in one city.'],
+  balancer:      ['BALANCER',       'Solve the land vs warming mission.'],
   globetrotter:  ['GLOBETROTTER',   'Become City Master in all 4 cities.'],
 };
 const CITY_LIST = ['China', 'Cote_d_Ivoire', 'Pakistan', 'Rwanda'];
@@ -522,8 +572,34 @@ function buildMissions(cityKey) {
       return `TWIST! If you only count squares with at least one floor (3 m), this same world ranks ${rank} of 15 for ground covered. Where you draw the line changes the answer.`;
     } };
 
-  const list = [m0, m1, m2, m3, m4, m5, m6].filter(ms => { ms.solutions = worlds.filter(ms.ok); return ms.solutions.length >= 1; });
-  return list.length >= 5 && list[0].id === 'trend' ? list : null;
+  // 7. land vs warming (only when Martin's data/tradeoff.csv is there)
+  const mods = [m0, m1, m2, m3, m4, m5, m6];
+  const td = tradeoff && tradeoff[cityKey];
+  if (td && worlds.every(w => td[`${w.ssp}|${w.path}`])) {
+    worlds.forEach(w => { const t = td[`${w.ssp}|${w.path}`]; w.land = isFinite(t.land) ? t.land : w.m.footprint_01; w.warm = t.warming; });
+    const lo = a => Math.min(...a), hi = a => Math.max(...a);
+    const L = worlds.map(w => w.land), W = worlds.map(w => w.warm);
+    worlds.forEach(w => {
+      w.saved = (hi(L) - w.land) / ((hi(L) - lo(L)) || 1);          // 1 = saves the most land
+      w.heat = (w.warm - lo(W)) / ((hi(W) - lo(W)) || 1);           // 1 = warms the most
+      w.net = Math.round(100 * (w.saved - w.heat));
+    });
+    const best = hi(worlds.map(w => w.net));
+    const mostLand = worlds.reduce((a, b) => (b.saved > a.saved ? b : a)), coolest = worlds.reduce((a, b) => (b.heat < a.heat ? b : a));
+    const detail = w => `LAND SAVED +${Math.round(w.saved * 100)}, WARMING -${Math.round(w.heat * 100)}, BALANCE ${w.net > 0 ? '+' : ''}${w.net}.`;
+    mods.push({ id: 'tradeoff', level: 'Final', title: 'SAVE LAND, STAY COOL',
+      text: 'FINAL MISSION. Every world saves some land and causes some warming. Each test gives you points for LAND SAVED and takes points away for WARMING. Find the world with the best balance.',
+      ok: w => w.net >= best - 5, detail,
+      feedback: w => `${detail(w)} The best balance is ${best > 0 ? '+' : ''}${best}.`,
+      twist: () => mostLand === coolest
+        ? 'In this city one world is both the best for land and for warming. That is rare.'
+        : `TAKE-HOME: the world that saves the MOST land (${mostLand.ssp} + ${mostLand.path.toUpperCase()}) is not the one that warms the LEAST (${coolest.ssp} + ${coolest.path.toUpperCase()}). You cannot win on both at the same time.` });
+  }
+
+  const list = mods.filter(ms => { ms.solutions = worlds.filter(ms.ok); return ms.solutions.length >= 1; });
+  if (list.length < 5 || list[0].id !== 'trend') return null;
+  list.worlds = worlds;
+  return list;
 }
 
 const cityTotal = (store, cityKey) => Object.values(store.progress[cityKey] || {}).reduce((s, r) => s + (r.score || 0), 0);
@@ -533,7 +609,7 @@ const cityDone = (store, cityKey, list) => !!list && list.every(ms => { const r 
 const pm = { list: null, idx: 0, lives: 3, fails: 0, hint: false, ssp: null, path: null, done: false, lastTest: null };
 
 async function renderMissionList() {
-  await metricsReady;
+  await Promise.all([metricsReady, tradeoffReady]);
   const box = $('mission-list'); box.innerHTML = '';
   $('missions-city').textContent = state.city ? state.city.toUpperCase() : '';
   pm.list = state.cityKey ? buildMissions(state.cityKey) : null;
@@ -598,7 +674,7 @@ function startMission(i) {
   const c = $('canvas3'); c.width = 320; c.height = 192; c.getContext('2d').clearRect(0, 0, 320, 192);
   $('pm-source').textContent = '';
   showScreen('screen-play');
-  updatePlayHud(); showPoints(); showTotal();
+  updatePlayHud(); showPoints(); showTotal(); showMissionMap();
   if (!Guide.seen) { Guide.open = true; Guide.seen = true; try { localStorage.setItem('guide_seen', '1'); } catch (e) { /* ignore */ } syncGuide(); }
 }
 
@@ -632,13 +708,22 @@ $('pm-hint').addEventListener('click', () => {
   showPoints();
 });
 
+function drawMissionPixel() {
+  const c = $('canvas3');
+  if (pm.lastTest) { state.ssp = pm.ssp; state.pathway = pm.path; drawFrame(c, 2100, $('pm-source'), false); }
+  else { c.width = 320; c.height = 192; c.getContext('2d').clearRect(0, 0, 320, 192); $('pm-source').textContent = 'PICK A WORLD'; }
+}
+function showMissionMap() {
+  Bars.level = 3; Bars.lastYear = 2100;
+  if (Bars.mode === 'pixel') drawMissionPixel(); else renderBars(3, 2100);
+}
 function testNow() {
   if (locked() || !(pm.ssp && pm.path)) return;
   const id = `${pm.ssp}|${pm.path}`;
   if (pm.lastTest === id) return;                      // same world twice: no second test
   pm.lastTest = id;
   state.ssp = pm.ssp; state.pathway = pm.path;
-  drawFrame($('canvas3'), 2100, $('pm-source'), false);
+  showMissionMap();
   const ms = pm.list[pm.idx];
   const w = findWorld(pm.ssp, pm.path);
   markExplored();
@@ -648,8 +733,8 @@ function testNow() {
 }
 function findWorld(ssp, path) {
   // the same world objects used inside buildMissions (identity matters for "best" checks)
-  for (const ms of pm.list) { const s = ms.solutions.find(x => x.ssp === ssp && x.path === path); if (s) return s; }
-  return { ssp, path, m: metrics[state.cityKey][`ours|${ssp}|${path}|2100`] };
+  const w = pm.list.worlds.find(x => x.ssp === ssp && x.path === path);
+  return w || { ssp, path, m: metrics[state.cityKey][`ours|${ssp}|${path}|2100`] };
 }
 
 function onMiss(ms, w) {
@@ -681,11 +766,13 @@ function onWin(ms, w) {
   if (medal === 'gold') give('gold');
   if ((store.stats.tests || 0) >= 25) give('tester');
   if (ms.id === 'boss') give('floor_spotter');
+  if (ms.id === 'tradeoff') give('balancer');
   if (cityDone(store, state.cityKey, pm.list)) give('master');
   if (CITY_LIST.every(c => cityDone(store, c, buildMissions(c)))) give('globetrotter');
   saveStore(store);
 
   let msg = `MISSION COMPLETE! ${medal.toUpperCase()} MEDAL, ${score} POINTS.`;
+  if (ms.detail) msg += ' ' + ms.detail(w);
   if (ms.twist) msg += ' ' + ms.twist(w);
   if (newBadges.length) msg += ' NEW BADGE: ' + newBadges.join(', ') + '.';
   $('pm-verdict').textContent = msg;
@@ -881,6 +968,10 @@ function snapshotYears(meta, ssp, path) {
   return ys.sort((a, b) => a - b);
 }
 function pickField(meta, level, year) {
+  if (level === 3) {                                   // mission: today (2015) until a world is tested, then that world in 2100
+    if (!pm.lastTest) return { name: 'hist_2015', year: 2015, today: true };
+    level = 2; year = 2100;
+  }
   if (level === 1 || year <= 2015) { const y = level === 1 ? year : 2015; return { name: `hist_${y}`, year: y }; }
   const ys = snapshotYears(meta, state.ssp, state.pathway);
   if (!ys.length) return null;
@@ -899,15 +990,29 @@ function ensureMap() {
   Bars.map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
   return true;
 }
+const STAGE_OF = { 1: 'stage1', 2: 'stage2', 3: 'pm-stage' };
 function mountMap(level) {
-  const stage = $(`stage${level}`), holder = $('map3d');
-  [1, 2].forEach(n => $(`stage${n}`).classList.toggle('is3d', Bars.mode !== 'pixel' && n === level));
+  const stage = $(STAGE_OF[level]), holder = $('map3d');
+  [1, 2, 3].forEach(n => $(STAGE_OF[n]).classList.toggle('is3d', Bars.mode !== 'pixel' && n === level));
   if (holder.parentElement !== stage) { holder.hidden = false; stage.appendChild(holder); }
 }
 
-async function renderBars(level, year) {
-  const b = await loadBars(state.cityKey);
-  const note = $(`l${level}-source`);
+let rbSeq = 0, rbPending = null, rbPromise = null;
+function renderBars(level, year) {           // several slider moves in one frame -> only the last one is drawn
+  rbPending = { level, year };
+  if (!rbPromise) rbPromise = new Promise(res => requestAnimationFrame(async () => {
+    const job = rbPending; rbPending = null; rbPromise = null;
+    try { await renderBarsNow(job.level, job.year); } finally { res(); }
+  }));
+  return rbPromise;
+}
+const rampLut = (() => { const l = new Uint8Array(256 * 3); for (let i = 0; i < 256; i++) l.set(colorRamp(i / 255), i * 3); return l; })();
+
+async function renderBarsNow(level, year) {
+  const seq = ++rbSeq;
+  const [b] = await Promise.all([loadBars(state.cityKey), libsReady]);
+  if (seq !== rbSeq) return;
+  const note = $(level === 3 ? 'pm-source' : `l${level}-source`);
   const fail = msg => { note.textContent = msg; Bars.mode = 'pixel'; syncViewUi(); };
   if (!b) return fail('MAP DATA MISSING (RUN prepare_bars.py)');
   if (!window.maplibregl || !window.deck) return fail('MAP LIBRARIES NOT LOADED (OFFLINE?)');
@@ -918,24 +1023,32 @@ async function renderBars(level, year) {
   const fld = pickField(meta, level, year);
   if (!fld) { note.textContent = 'NO MAP DATA FOR THIS WORLD'; return; }
   const fi = meta.fields.indexOf(fld.name), n = meta.n, off = fi * n;
-  const minH = Bars.hideLow ? FLOOR_M : 0.1;
-  const data = [];
-  for (let i = 0; i < n; i++) { const h = u16[off + i] / meta.scale; if (h >= minH) data.push({ p: meta.lonlat[i], h }); }
+  if (!b.pos) { b.pos = new Float32Array(n * 2); for (let i = 0; i < n; i++) { b.pos[2 * i] = meta.lonlat[i][0]; b.pos[2 * i + 1] = meta.lonlat[i][1]; } }
+  const minH = Bars.hideLow ? FLOOR_M : 0.1, sc = meta.scale;
+  const pos = new Float32Array(n * 2), elev = new Float32Array(n), col = new Uint8Array(n * 4);
+  let k = 0;
+  for (let i = 0; i < n; i++) {
+    const h = u16[off + i] / sc; if (h < minH) continue;
+    pos[2 * k] = b.pos[2 * i]; pos[2 * k + 1] = b.pos[2 * i + 1]; elev[k] = h;
+    const t = Math.min(255, Math.round(h / meta.hmax * 255)) * 3;
+    col[4 * k] = rampLut[t]; col[4 * k + 1] = rampLut[t + 1]; col[4 * k + 2] = rampLut[t + 2]; col[4 * k + 3] = 255;
+    k++;
+  }
   const is3d = Bars.mode === '3d';
   note.textContent = (year > 2015 && fld.year !== year ? `SNAPSHOT: ${fld.year}` : 'REAL DATA') + (is3d ? ` | HEIGHT x${Bars.exag}` : ' | 500 M BLOCKS');
+  if (level === 3) note.textContent = fld.today ? 'TODAY (2015, REAL DATA): pick a world to see 2100' : `2100 | ${state.ssp} + ${state.pathway.toUpperCase()}` + (is3d ? ` | HEIGHT x${Bars.exag}` : '');
   document.querySelectorAll('.legend-max').forEach(el => { el.textContent = meta.hmax.toFixed(0) + ' M'; });
   const half = meta.block_m / 2 * (is3d ? 0.55 : 1.0);
   Bars.overlay.setProps({ layers: [new deck.ColumnLayer({
-    id: 'bars', data, diskResolution: 4, angle: 45, radius: half * Math.SQRT2, extruded: is3d, flatShading: true,
-    getPosition: d => d.p, getElevation: d => d.h, elevationScale: Bars.exag, opacity: Bars.opacity,
-    getFillColor: d => colorRamp(d.h / meta.hmax),
+    id: 'bars', data: { length: k, attributes: { getPosition: { value: pos, size: 2 }, getElevation: { value: elev, size: 1 }, getFillColor: { value: col, size: 4 } } },
+    diskResolution: 4, angle: 45, radius: half * Math.SQRT2, extruded: is3d, flatShading: true,
+    elevationScale: Bars.exag, opacity: Bars.opacity,
     material: { ambient: 0.75, diffuse: 0.45, shininess: 0, specularColor: [0, 0, 0] },
-    updateTriggers: { getFillColor: [state.cityKey], getElevation: [Bars.exag] },
-    transitions: { getElevation: 300 },
   })] });
   if (Bars.fitted !== state.cityKey) {                  // fly to the city the first time
-    const xs = meta.lonlat.map(p => p[0]), ys = meta.lonlat.map(p => p[1]);
-    Bars.map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, duration: 0, ...viewPose() });
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (let i = 0; i < n; i++) { const x = b.pos[2 * i], y = b.pos[2 * i + 1]; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    Bars.map.fitBounds([[x0, y0], [x1, y1]], { padding: 40, duration: 0, ...viewPose() });
     Bars.fitted = state.cityKey;
   }
 }
@@ -948,7 +1061,7 @@ function syncViewUi() {
   document.querySelectorAll('.exag-toggle').forEach(b => { b.textContent = `HEIGHT x${Bars.exag}`; });
   document.querySelectorAll('.base-toggle').forEach(b => { b.textContent = `BASEMAP: ${Bars.base.toUpperCase()}`; });
   document.querySelectorAll('.opacity-range').forEach(r => { r.value = Bars.opacity; });
-  if (Bars.mode === 'pixel') [1, 2].forEach(n => $(`stage${n}`).classList.remove('is3d'));
+  if (Bars.mode === 'pixel') [1, 2, 3].forEach(n => $(STAGE_OF[n]).classList.remove('is3d'));
 }
 
 syncViewUi();
@@ -960,8 +1073,9 @@ function refreshViews(level, year) {
 }
 document.querySelectorAll('.view-toggle').forEach(b => b.addEventListener('click', async () => {
   Bars.mode = NEXT_MODE[Bars.mode]; syncViewUi();
-  const level = $('screen-level2').classList.contains('active') ? 2 : 1;
-  if (Bars.mode === 'pixel') return;
+  const level = $('screen-play').classList.contains('active') ? 3 : $('screen-level2').classList.contains('active') ? 2 : 1;
+  if (Bars.mode === 'pixel') { if (level === 3) drawMissionPixel(); return; }
+  Bars.level = level; if (level === 3) Bars.lastYear = 2100;
   await renderBars(level, Bars.lastYear);
   if (Bars.map && Bars.mode !== 'pixel') Bars.map.easeTo({ ...viewPose(), duration: 700 });   // flat <-> tilted
 }));
@@ -980,17 +1094,22 @@ document.querySelectorAll('.base-toggle').forEach(b => b.addEventListener('click
 }));
 
 // ---------- V(t) window: open with the button, drag by the title bar, close with the box ----------
-const VtWin = { open: false };
+const VtWin = { open: true };
 function syncVtWindows() {
   [1, 2].forEach(n => { $(`vtwin${n}`).hidden = !(VtWin.open && $(`screen-level${n}`).classList.contains('active')); });
   document.querySelectorAll('.vt-toggle').forEach(b => b.classList.toggle('selected', VtWin.open));
 }
-document.querySelectorAll('.vt-toggle').forEach(b => b.addEventListener('click', () => { VtWin.open = !VtWin.open; syncVtWindows(); }));
+document.querySelectorAll('.vt-toggle').forEach(b => b.addEventListener('click', () => {
+  VtWin.open = !VtWin.open;
+  if (VtWin.open) document.querySelectorAll('.vt-window.vt').forEach(w => { w.classList.remove('floating'); w.removeAttribute('style'); });   // re-dock
+  syncVtWindows();
+}));
 document.querySelectorAll('.vt-close').forEach(b => b.addEventListener('click', () => { VtWin.open = false; syncVtWindows(); }));
 document.querySelectorAll('.vt-bar').forEach(bar => bar.addEventListener('pointerdown', e => {
   if (e.target.closest('.vt-close')) return;
   const w = bar.closest('.vt-window'), r = w.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
-  Object.assign(w.style, { right: 'auto', bottom: 'auto', left: r.left + 'px', top: r.top + 'px' });
+  if (w.id !== 'guide') w.classList.add('floating');
+  Object.assign(w.style, { right: 'auto', bottom: 'auto', left: r.left + 'px', top: r.top + 'px', width: r.width + 'px' });
   const move = ev => {
     w.style.left = Math.max(0, Math.min(innerWidth - w.offsetWidth, ev.clientX - dx)) + 'px';
     w.style.top = Math.max(0, Math.min(innerHeight - 40, ev.clientY - dy)) + 'px';

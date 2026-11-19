@@ -52,14 +52,17 @@
           <button class="hud-btn vt-toggle">V(t) CURVE</button>
           <button class="hud-btn view-toggle">MAP VIEW</button>
         </div>
-        <div class="stage" id="stage1"><canvas id="canvas1" width="320" height="192"></canvas></div>
+        <div class="stage" id="stage1"><div class="year-big" id="l1-bigyear"></div><canvas id="canvas1" width="320" height="192"></canvas></div>
         <div class="legend" data-legend>
           <span class="legend-label">BUILT HEIGHT</span>
           <span>0 M</span><div class="legend-bar"></div><span class="legend-max">30 M</span>
         </div>
-        <input type="range" id="l1-slider" class="tl tl-past" min="0" max="4" value="0" step="1" aria-label="Year">
+        <div class="time-box nudge" id="l1-time">
+          <p class="time-prompt"><span>&#9664;</span> SLIDE THROUGH TIME <span>&#9654;</span></p>
+          <input type="range" id="l1-slider" class="tl tl-past" min="0" max="4" value="0" step="1" aria-label="Year">
+          <div class="ticks" id="l1-ticks"></div>
+        </div>
         <p class="timeline-key"><span class="key obs"></span>OBSERVED DATA (SATELLITE)</p>
-        <p class="hint">&#9664; DRAG TO TRAVEL IN TIME &#9654;</p>
         <div class="tools3d">
           <label class="opacity">OVERLAY <input type="range" class="opacity-range" min="0.2" max="1" step="0.05" value="0.85" aria-label="Overlay opacity"></label>
           <button class="hud-btn base-toggle">BASEMAP: DARK</button>
@@ -125,6 +128,7 @@
           <div class="chip bumpable" id="pm-score"></div>
           <div class="chip" id="pm-total"></div>
           <button class="hud-btn guide-toggle">? GUIDE</button>
+          <button class="hud-btn view-toggle">MAP VIEW</button>
         </div>
         <div class="dialog"><p id="pm-text"></p></div>
 
@@ -143,6 +147,16 @@
 
         <div class="stage" id="pm-stage"><canvas id="canvas3" width="320" height="192"></canvas></div>
         <div class="legend"><span class="legend-label">THE CITY IN 2100</span><span class="chip" id="pm-source"></span></div>
+        <div class="legend" data-legend>
+          <span class="legend-label">BUILT HEIGHT</span>
+          <span>0 M</span><div class="legend-bar"></div><span class="legend-max">30 M</span>
+        </div>
+        <div class="tools3d">
+          <label class="opacity">OVERLAY <input type="range" class="opacity-range" min="0.2" max="1" step="0.05" value="0.85" aria-label="Overlay opacity"></label>
+          <button class="hud-btn base-toggle">BASEMAP: DARK</button>
+          <button class="hud-btn floor-toggle">SHOWING ALL BLOCKS</button>
+          <button class="hud-btn exag-toggle">HEIGHT x100</button>
+        </div>
         <div class="dialog" id="pm-verdict-box"><p id="pm-verdict"></p></div>
         <div class="choices">
           <button id="pm-retry" hidden>RETRY MISSION</button>
@@ -208,14 +222,17 @@
           <button class="hud-btn vt-toggle">V(t) CURVE</button>
           <button class="hud-btn view-toggle">MAP VIEW</button>
         </div>
-        <div class="stage" id="stage2"><canvas id="canvas2" width="320" height="192"></canvas></div>
+        <div class="stage" id="stage2"><div class="year-big" id="l2-bigyear"></div><canvas id="canvas2" width="320" height="192"></canvas></div>
         <div class="legend" data-legend>
           <span class="legend-label">BUILT HEIGHT</span>
           <span>0 M</span><div class="legend-bar"></div><span class="legend-max">30 M</span>
         </div>
-        <input type="range" id="l2-slider" class="tl tl-future" min="0" max="9" value="0" step="1" aria-label="Year">
+        <div class="time-box nudge" id="l2-time">
+          <p class="time-prompt"><span>&#9664;</span> SLIDE THROUGH TIME <span>&#9654;</span></p>
+          <input type="range" id="l2-slider" class="tl tl-future" min="0" max="9" value="0" step="1" aria-label="Year">
+          <div class="ticks" id="l2-ticks"></div>
+        </div>
         <p class="timeline-key"><span class="key obs"></span>OBSERVED DATA <span class="key sim"></span>MODEL SCENARIO</p>
-        <p class="hint">&#9664; DRAG TO TRAVEL IN TIME &#9654;</p>
         <div class="tools3d">
           <label class="opacity">OVERLAY <input type="range" class="opacity-range" min="0.2" max="1" step="0.05" value="0.85" aria-label="Overlay opacity"></label>
           <button class="hud-btn base-toggle">BASEMAP: DARK</button>
@@ -264,8 +281,6 @@
 
   <div id="map3d" hidden></div>
 
-  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
-  <script src="https://unpkg.com/deck.gl@8.9.35/dist.min.js"></script>
   <script src="main.js"></script>
 </body>
 </html>
