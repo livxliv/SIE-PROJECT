@@ -32,6 +32,13 @@ def country_of(p):
     return p.name.split("__")[0].replace("C_te_d_Ivoire", "Cote_d_Ivoire")
 
 files = sorted(src.glob("*.geojson"), key=lambda p: p.stat().st_size)
+# one urban system per country: keep only the biggest one (rank001) if several ranks are present
+_seen = {}
+for f in sorted(files, key=lambda p: p.name):
+    m = re.search(r"__rank(\d+)__", f.name)
+    c = country_of(f); r = int(m.group(1)) if m else 1
+    if c not in _seen or r < _seen[c][0]: _seen[c] = (r, f)
+files = [f for f in files if _seen[country_of(f)][1] == f]
 if filters:
     files = [f for f in files if any(k in f.name.lower() for k in filters)]
 

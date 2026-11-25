@@ -3,13 +3,7 @@
 // =====================================================================
 const TEXTS = {
   hook: 'Pick a city, travel in time from 1980 to 2100, and watch it grow: wider, taller, or both.',
-  cityIntro: 'Four places, four stories. Which one do you want to follow?',
-  city: {
-    China:    'Around Beijing. The biggest map in the game: about 5,900 km² of squares.',
-    CIV:      'Around Abidjan, on the coast of West Africa. About 2,200 km² of squares.',
-    Pakistan: 'A fast-changing area of about 3,000 km² with a very dense centre.',
-    Rwanda:   'The smallest map: about 1,050 km². Every pixel counts.',
-  },
+  cityIntro: 'Many places, many stories. Which one do you want to follow?',
   // One line per observed year (Level 1)
   history: {
     1980: '1980. The first satellite picture. Tall, bright squares are places with big buildings.',
@@ -76,7 +70,24 @@ const TEXTS = {
 const TILE = 16;
 const HISTORY_YEARS = [1980, 1990, 2000, 2010, 2015];
 const FUTURE_YEARS  = [2015, 2020, 2030, 2040, 2050, 2060, 2070, 2080, 2090, 2100]; // 2015 = last real year
-const CITY_KEYS = { 'China': 'China', "Cote d'Ivoire": 'Cote_d_Ivoire', 'Pakistan': 'Pakistan', 'Rwanda': 'Rwanda' };
+const CITIES = [
+  // label = name on the card, key = name of the files in data/bars (what prepare_bars.py wrote), blurb = one line on the card
+  { label: 'China',         key: 'China',         blurb: 'Around Beijing. The biggest map in the game: about 5,900 km\u00b2 of squares.' },
+  { label: "Cote d'Ivoire", key: 'Cote_d_Ivoire', blurb: 'Around Abidjan, on the coast of West Africa. About 2,200 km\u00b2 of squares.' },
+  { label: 'Pakistan',      key: 'Pakistan',      blurb: 'A fast-changing area of about 3,000 km\u00b2 with a very dense centre.' },
+  { label: 'Rwanda',        key: 'Rwanda',        blurb: 'The smallest map: about 1,050 km\u00b2. Every pixel counts.' },
+  { label: 'Ghana',         key: 'Ghana',         blurb: 'The biggest urban system of Ghana, around Accra on the Gulf of Guinea.' },
+  { label: 'Egypt',         key: 'Egypt',         blurb: 'The biggest urban system of Egypt, around Cairo and the Nile.' },
+  { label: 'Argentina',     key: 'Argentina',     blurb: 'The biggest urban system of Argentina, around Buenos Aires.' },
+  { label: 'Sudan',         key: 'Sudan',         blurb: 'The biggest urban system of Sudan, around Khartoum where the two Niles meet.' },
+  { label: 'Sri Lanka',     key: 'Sri_Lanka',     blurb: 'The biggest urban system of Sri Lanka, around Colombo on the west coast.' },
+  { label: 'Thailand',      key: 'Thailand',      blurb: 'The biggest urban system of Thailand, around Bangkok.' },
+  { label: 'Peru',          key: 'Peru',          blurb: 'The biggest urban system of Peru, around Lima, a desert city by the Pacific.' },
+  { label: 'Mexico',        key: 'Mexico',        blurb: 'The biggest urban system of Mexico, around Mexico City.' },
+  { label: 'Zambia',        key: 'Zambia',        blurb: 'The biggest urban system of Zambia, around Lusaka.' },
+];
+const CITY_KEYS = {};          // label -> key, filled by initCities()
+let CITY_LIST = [];            // keys of the cities that really have data
 
 const state = { city: null, cityKey: null, ssp: null, pathway: null };
 
@@ -191,14 +202,34 @@ function showScreen(id) {
 }
 document.querySelectorAll('[data-goto]').forEach(b => b.addEventListener('click', () => showScreen(b.dataset.goto)));
 
-document.querySelectorAll('[data-city]').forEach(btn => {
-  btn.addEventListener('click', async () => {
-    await manifestReady;
-    state.city = btn.dataset.city;
-    state.cityKey = CITY_KEYS[state.city];
-    showScreen('screen-level1');
+// City cards are built from CITIES, and only for cities that have data (metrics.json / vt.json)
+const looseKey = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+async function initCities() {
+  await Promise.all([metricsReady, vtReady]);
+  const have = Object.keys(Object.assign({}, vtAll || {}, metrics || {}));
+  const noData = !have.length;                       // no data folder at all: show every card
+  CITY_LIST = [];
+  const box = $('city-cards'); box.textContent = '';
+  CITIES.forEach(c => {
+    const real = noData ? c.key : have.find(k => looseKey(k) === looseKey(c.key));
+    if (!real) return;
+    CITY_KEYS[c.label] = real; CITY_LIST.push(real);
+    const b = document.createElement('button');
+    b.className = 'card'; b.dataset.city = c.label;
+    const t = document.createElement('b'); t.textContent = c.label.toUpperCase();
+    const s = document.createElement('span'); s.textContent = c.blurb;
+    b.append(t, s);
+    b.addEventListener('click', async () => {
+      await manifestReady;
+      state.city = c.label; state.cityKey = real;
+      showScreen('screen-level1');
+    });
+    box.appendChild(b);
   });
-});
+  BADGE_DEFS.globetrotter[1] = `Become City Master in all ${CITY_LIST.length} cities.`;
+  const intro = document.querySelector('[data-text="cityIntro"]');
+  if (intro) intro.textContent = `${CITY_LIST.length} places, ${CITY_LIST.length} stories. Which one do you want to follow?`;
+}
 
 // ---------------------------------------------------------------------
 //  Minimum building height (open question with the supervisors: ~3 m = 1 floor).
@@ -307,7 +338,7 @@ function updateLevel1() {
   $('l1-year').parentElement.className = 'chip year kind-obs';
   $('l1-dialog').textContent = TEXTS.history[year];
   markTime('l1', year);
-  drawFrame($('canvas1'), year, $('l1-source'), true);
+  if (Bars.mode === 'pixel') drawFrame($('canvas1'), year, $('l1-source'), true);
   refreshViews(1, year);
 }
 function startLevel1() {
@@ -350,7 +381,7 @@ function updateLevel2() {
   if (+l2Slider.value === FUTURE_YEARS.length - 1 && markExplored()) {
     $('l2-dialog').textContent = TEXTS.newWorld + `${exploredFor(state.cityKey).length}/15. ` + TEXTS.pathway[state.pathway];
   }
-  drawFrame($('canvas2'), year, $('l2-source'), false);
+  if (Bars.mode === 'pixel') drawFrame($('canvas2'), year, $('l2-source'), false);
   refreshViews(2, year);
 }
 function startLevel2() {
@@ -485,7 +516,6 @@ const BADGE_DEFS = {
   balancer:      ['BALANCER',       'Solve the land vs warming mission.'],
   globetrotter:  ['GLOBETROTTER',   'Become City Master in all 4 cities.'],
 };
-const CITY_LIST = ['China', 'Cote_d_Ivoire', 'Pakistan', 'Rwanda'];
 
 // ---------- Build the missions of the current city ----------
 function buildMissions(cityKey) {
@@ -850,6 +880,7 @@ const BASEMAP_OVERRIDE = new URLSearchParams(location.search).get('basemap') ===
 // ---------- load the files ----------
 let vtAll = null;
 const vtReady = fetch('data/bars/vt.json').then(r => r.json()).then(j => { vtAll = j; }).catch(() => { vtAll = null; });
+initCities();
 const barsCache = {};
 async function loadBars(key) {
   if (key in barsCache) return barsCache[key];
@@ -862,7 +893,12 @@ async function loadBars(key) {
 }
 
 // ---------- V(t) panel (pixel line chart) ----------
+const vtParsed = {};
 function parseVt(key) {
+  if (key in vtParsed) return vtParsed[key];
+  return (vtParsed[key] = parseVtRaw(key));
+}
+function parseVtRaw(key) {
   const v = vtAll && vtAll[key]; if (!v) return null;
   const obs = [], scen = {};
   Object.entries(v).forEach(([f, val]) => {
@@ -984,8 +1020,8 @@ function ensureMap() {
   if (Bars.map) return true;
   if (!window.maplibregl || !window.deck) return false;
   const style = BASEMAP_OVERRIDE || BASEMAPS[Bars.base];
-  Bars.map = new maplibregl.Map({ container: 'map3d', style, center: [0, 0], zoom: 2, attributionControl: true, ...viewPose() });
-  Bars.overlay = new deck.MapboxOverlay({ layers: [] });
+  Bars.map = new maplibregl.Map({ container: 'map3d', style, center: [0, 0], zoom: 2, attributionControl: true, pixelRatio: Math.min(window.devicePixelRatio || 1, 1.5), fadeDuration: 0, ...viewPose() });
+  Bars.overlay = new deck.MapboxOverlay({ layers: [], useDevicePixels: Math.min(window.devicePixelRatio || 1, 1.5) });
   Bars.map.addControl(Bars.overlay);
   Bars.map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'top-right');
   return true;
@@ -998,6 +1034,7 @@ function mountMap(level) {
 }
 
 let rbSeq = 0, rbPending = null, rbPromise = null;
+const arrCache = new Map();
 function renderBars(level, year) {           // several slider moves in one frame -> only the last one is drawn
   rbPending = { level, year };
   if (!rbPromise) rbPromise = new Promise(res => requestAnimationFrame(async () => {
@@ -1018,33 +1055,47 @@ async function renderBarsNow(level, year) {
   if (!window.maplibregl || !window.deck) return fail('MAP LIBRARIES NOT LOADED (OFFLINE?)');
   mountMap(level);                 // show + move the container first, so the map gets its real size
   ensureMap();
-  Bars.map.resize();
+  const holder = $('map3d'), sz = holder.clientWidth + 'x' + holder.clientHeight;
+  if (Bars.size !== sz) { Bars.size = sz; Bars.map.resize(); }      // resizing on every slider move was slow
   const { meta, u16 } = b;
   const fld = pickField(meta, level, year);
   if (!fld) { note.textContent = 'NO MAP DATA FOR THIS WORLD'; return; }
   const fi = meta.fields.indexOf(fld.name), n = meta.n, off = fi * n;
   if (!b.pos) { b.pos = new Float32Array(n * 2); for (let i = 0; i < n; i++) { b.pos[2 * i] = meta.lonlat[i][0]; b.pos[2 * i + 1] = meta.lonlat[i][1]; } }
   const minH = Bars.hideLow ? FLOOR_M : 0.1, sc = meta.scale;
-  const pos = new Float32Array(n * 2), elev = new Float32Array(n), col = new Uint8Array(n * 4);
-  let k = 0;
-  for (let i = 0; i < n; i++) {
-    const h = u16[off + i] / sc; if (h < minH) continue;
-    pos[2 * k] = b.pos[2 * i]; pos[2 * k + 1] = b.pos[2 * i + 1]; elev[k] = h;
-    const t = Math.min(255, Math.round(h / meta.hmax * 255)) * 3;
-    col[4 * k] = rampLut[t]; col[4 * k + 1] = rampLut[t + 1]; col[4 * k + 2] = rampLut[t + 2]; col[4 * k + 3] = 255;
-    k++;
+  // arrays are cached per city + field + threshold, so going back and forth in time costs nothing
+  const ck = `${state.cityKey}|${fld.name}|${minH}`;
+  let arr = arrCache.get(ck);
+  if (!arr) {
+    const pos = new Float32Array(n * 2), elev = new Float32Array(n), col = new Uint8Array(n * 4);
+    let k = 0;
+    for (let i = 0; i < n; i++) {
+      const h = u16[off + i] / sc; if (h < minH) continue;
+      pos[2 * k] = b.pos[2 * i]; pos[2 * k + 1] = b.pos[2 * i + 1]; elev[k] = h;
+      const t = Math.min(255, Math.round(h / meta.hmax * 255)) * 3;
+      col[4 * k] = rampLut[t]; col[4 * k + 1] = rampLut[t + 1]; col[4 * k + 2] = rampLut[t + 2]; col[4 * k + 3] = 255;
+      k++;
+    }
+    arr = { pos: pos.subarray(0, 2 * k), elev: elev.subarray(0, k), col: col.subarray(0, 4 * k), k };
+    arrCache.set(ck, arr);
+    if (arrCache.size > 8) arrCache.delete(arrCache.keys().next().value);       // keep the 8 latest
   }
+  const { pos, elev, col, k } = arr;
   const is3d = Bars.mode === '3d';
   note.textContent = (year > 2015 && fld.year !== year ? `SNAPSHOT: ${fld.year}` : 'REAL DATA') + (is3d ? ` | HEIGHT x${Bars.exag}` : ' | 500 M BLOCKS');
   if (level === 3) note.textContent = fld.today ? 'TODAY (2015, REAL DATA): pick a world to see 2100' : `2100 | ${state.ssp} + ${state.pathway.toUpperCase()}` + (is3d ? ` | HEIGHT x${Bars.exag}` : '');
   document.querySelectorAll('.legend-max').forEach(el => { el.textContent = meta.hmax.toFixed(0) + ' M'; });
   const half = meta.block_m / 2 * (is3d ? 0.55 : 1.0);
+  const sig = `${ck}|${is3d}|${Bars.exag}|${Bars.opacity}`;
+  if (Bars.sig !== sig) {
+  Bars.sig = sig;
   Bars.overlay.setProps({ layers: [new deck.ColumnLayer({
     id: 'bars', data: { length: k, attributes: { getPosition: { value: pos, size: 2 }, getElevation: { value: elev, size: 1 }, getFillColor: { value: col, size: 4 } } },
     diskResolution: 4, angle: 45, radius: half * Math.SQRT2, extruded: is3d, flatShading: true,
     elevationScale: Bars.exag, opacity: Bars.opacity,
-    material: { ambient: 0.75, diffuse: 0.45, shininess: 0, specularColor: [0, 0, 0] },
+    material: { ambient: 0.75, diffuse: 0.45, shininess: 0, specularColor: [0, 0, 0] }, pickable: false,
   })] });
+  }
   if (Bars.fitted !== state.cityKey) {                  // fly to the city the first time
     let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
     for (let i = 0; i < n; i++) { const x = b.pos[2 * i], y = b.pos[2 * i + 1]; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
@@ -1074,7 +1125,11 @@ function refreshViews(level, year) {
 document.querySelectorAll('.view-toggle').forEach(b => b.addEventListener('click', async () => {
   Bars.mode = NEXT_MODE[Bars.mode]; syncViewUi();
   const level = $('screen-play').classList.contains('active') ? 3 : $('screen-level2').classList.contains('active') ? 2 : 1;
-  if (Bars.mode === 'pixel') { if (level === 3) drawMissionPixel(); return; }
+  if (Bars.mode === 'pixel') {
+    if (level === 3) drawMissionPixel();
+    else if (level === 1) updateLevel1(); else updateLevel2();
+    return;
+  }
   Bars.level = level; if (level === 3) Bars.lastYear = 2100;
   await renderBars(level, Bars.lastYear);
   if (Bars.map && Bars.mode !== 'pixel') Bars.map.easeTo({ ...viewPose(), duration: 700 });   // flat <-> tilted
